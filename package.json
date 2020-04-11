@@ -4,7 +4,6 @@
   "description": "Poker API",
   "main": "built/index.js",
   "scripts": {
-    "prestart": "tsc",
     "start": "node built/index.js",
     "test": "jest",
     "tsc": "tsc",
