@@ -22,8 +22,8 @@
   },
   "homepage": "https://github.com/desmondmc/poker-backend#readme",
   "dependencies": {
-    "@kavsingh/poker-cards": "0.0.11",
     "poker-messages": "https://github.com/desmondmc/poker-messages#3f7f64565571e087c9818762bd9478cc5fbf1437",
+    "poker-cards": "https://github.com/desmondmc/poker-cards#ba89df2fdd86c1d875db130a9a27c46bfe562dc1",
     "ws": "^7.2.3"
   },
   "devDependencies": {

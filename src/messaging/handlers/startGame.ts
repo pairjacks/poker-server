@@ -1,5 +1,4 @@
 import WebSocket from "ws";
-import { createDeck, shuffleDeckNaive } from "@kavsingh/poker-cards";
 import { getTable, saveTable } from "../../state/global";
 import { sendTableStateMessage } from "../outbound";
 import { startGameMutator } from "../../state/mutators";

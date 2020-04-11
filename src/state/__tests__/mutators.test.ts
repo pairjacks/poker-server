@@ -7,7 +7,7 @@ import {
   awardWinnersMutator,
   callMutator,
 } from "../mutators";
-import { Face, Suit, Cards } from "@kavsingh/poker-cards";
+import { Face, Suit, Cards } from "poker-cards";
 import { mod } from "../utils";
 import { Table } from "../global";
 

@@ -1,4 +1,4 @@
-import { Cards } from "@kavsingh/poker-cards";
+import { Cards } from "poker-cards";
 
 /**
  * Table contains the entire state of a poker table

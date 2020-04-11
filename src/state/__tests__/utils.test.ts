@@ -1,5 +1,5 @@
 import { getSeatsThatWentAllInLowestToHighestBet } from "../utils";
-import { Face, Suit } from "@kavsingh/poker-cards";
+import { Face, Suit } from "poker-cards";
 import { Table } from "../global";
 
 export const createMockTable = (startingChipCount: number): Table => {

@@ -3,7 +3,7 @@ import { getTable, saveTable } from "../../state/global";
 import { sendTableStateMessage } from "../outbound";
 import { dealMutator } from "../../state/mutators";
 import { ClientDealMessage } from "poker-messages";
-import { shuffleDeckNaive, createDeck } from "@kavsingh/poker-cards";
+import { shuffleDeckNaive, createDeck } from "poker-cards";
 
 export const deal = async (ws: WebSocket, message: ClientDealMessage) => {
   const table = getTable(message.tableName);

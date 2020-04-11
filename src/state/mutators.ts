@@ -2,7 +2,7 @@ import {
   Cards,
   drawCardsFromDeck,
   findHighestHands,
-} from "@kavsingh/poker-cards";
+} from "poker-cards";
 import { Table, Player, Seat, SplitPot } from "./global";
 import {
   indexOfFirstNonBustSeatToLeftOfIndex,
