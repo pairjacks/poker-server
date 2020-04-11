@@ -1,12 +1,16 @@
+import express from "express";
 import WebSocket from "ws";
 import { processMessage } from "./messaging/router";
 
-const wss = new WebSocket.Server({
-  port: 8080
-});
+const PORT = process.env.PORT || 8080;
 
-wss.on("connection", ws => {
-  ws.on("message", message => {
+const server = express()
+  .listen(PORT, () => console.log("Listening on port:", PORT));
+
+const wss = new WebSocket.Server({ server });
+
+wss.on("connection", (ws) => {
+  ws.on("message", (message) => {
     if (typeof message !== "string") {
       return;
     }
