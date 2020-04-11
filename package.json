@@ -1,11 +1,11 @@
 {
-  "name": "poker-backend",
+  "name": "poker-server",
   "version": "0.0.1",
-  "description": "Poker Backend API",
-  "main": "built/server/src/index.js",
+  "description": "Poker API",
+  "main": "built/index.js",
   "scripts": {
     "prestart": "tsc",
-    "start": "node built/server/src/index.js",
+    "start": "node built/index.js",
     "test": "jest",
     "tsc": "tsc",
     "types": "tsc --skipLibCheck",
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/desmondmc/poker-backend.git"
+    "url": "git+https://github.com/desmondmc/poker-server.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/desmondmc/poker-backend/issues"
+    "url": "https://github.com/desmondmc/poker-server/issues"
   },
-  "homepage": "https://github.com/desmondmc/poker-backend#readme",
+  "homepage": "https://github.com/desmondmc/poker-server#readme",
   "dependencies": {
     "poker-messages": "https://github.com/desmondmc/poker-messages#3f7f64565571e087c9818762bd9478cc5fbf1437",
     "poker-cards": "https://github.com/desmondmc/poker-cards#ba89df2fdd86c1d875db130a9a27c46bfe562dc1",
