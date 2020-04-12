@@ -327,6 +327,74 @@ describe("mutators", () => {
       expect(mutatedTable.turnToBetIndex).toBe(3); // c (index 2) is folded so turn should be index 3.
       expect(mutatedTable.roundTerminatingSeatIndex).toBe(3);
     });
+
+    it.only("plays skips to the end of the game in heads up poker both players go all in", () => {
+      const table = createMockTable(50);
+
+      // @ts-ignore
+      table.deck = [
+        [Face.Two, Suit.Hearts],
+        [Face.Seven, Suit.Diamonds],
+        [Face.Four, Suit.Clubs],
+        [Face.Nine, Suit.Spades],
+        [Face.Five, Suit.Hearts],
+        [Face.Jack, Suit.Diamonds],
+        [Face.Two, Suit.Clubs],
+        [Face.Seven, Suit.Spades],
+        [Face.Queen, Suit.Spades],
+      ];
+
+      // @ts-ignore
+      table.seats = [table.seats[0], table.seats[1]];
+      // @ts-ignore
+      table.bettingRound = 'pre-flop';
+
+      // @ts-ignore
+      table.seats[0].chipCount = 100;
+      // @ts-ignore
+      table.seats[0].chipsBetCount = 2;
+      // @ts-ignore
+      table.seats[0].pocketCards = [
+        [Face.Ace, Suit.Diamonds],
+        [Face.Ace, Suit.Clubs],
+      ];
+
+      // @ts-ignore
+      table.seats[1].chipCount = 50;
+      // @ts-ignore
+      table.seats[1].chipsBetCount = 2;
+      // @ts-ignore
+      table.seats[1].pocketCards = [
+        [Face.King, Suit.Diamonds],
+        [Face.King, Suit.Clubs],
+      ];
+
+      // @ts-ignore
+      table.dealerIndex = 1;
+      // @ts-ignore
+      table.turnToBetIndex = 0;
+
+      const table1 = placeBetMutator({
+        table,
+        data: { seatToken: "a", betChipCount: 100 },
+      });
+
+      expect(table1).not.toBe(table);
+      expect(table1.turnToBetIndex).toBe(1);
+      expect(table1.roundTerminatingSeatIndex).toBe(1);
+      expect(table1.seats[0].chipsBetCount).toBe(102);
+
+      const table2 = placeBetMutator({
+        table: table1,
+        data: { seatToken: "b", betChipCount: 50 },
+      });
+
+      expect(table2).not.toBe(table1);
+      expect(table2.bettingRound).toBe("pre-deal");
+      expect(table2.mainPotChipCount).toBe(0);
+      expect(table2.splitPots).toEqual([]);
+      expect(table2.seats[0].chipCount).toBe(154);
+    });
   });
 
   describe("checkMutator", () => {

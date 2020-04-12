@@ -168,6 +168,7 @@ export const placeBetMutator: TableMutatorFunction<PlaceBetOptions> = ({
   data,
 }): Table => {
   const seatIndex = table.seats.findIndex((s) => s.token === data.seatToken);
+
   if (seatIndex === -1 || seatIndex !== table.turnToBetIndex) {
     return table;
   }
@@ -188,30 +189,27 @@ export const placeBetMutator: TableMutatorFunction<PlaceBetOptions> = ({
     return table;
   }
 
-  const nextSeatTurnIndex = indexOfFirstNonFoldedNonAllInSeatLeftOfSeatIndex(
-    table,
-    seatIndex
-  );
-
-  return {
-    ...table,
-    turnToBetIndex: nextSeatTurnIndex,
-    roundTerminatingSeatIndex: indexOfFirstNonFoldedNonAllInSeatRightOfSeatIndex(
-      table,
-      seatIndex
-    ),
-    lastSeatTokenToBetOnTheRiver:
-      table.bettingRound === "river" ? data.seatToken : undefined,
-    seats: table.seats.map((s) => {
-      return s.token === data.seatToken
-        ? {
-            ...s,
-            chipCount: s.chipCount - data.betChipCount,
-            chipsBetCount: s.chipsBetCount + data.betChipCount,
-          }
-        : s;
-    }),
-  };
+  return endTurnMutator({
+    table: {
+      ...table,
+      roundTerminatingSeatIndex: indexOfFirstNonFoldedNonAllInSeatRightOfSeatIndex(
+        table,
+        seatIndex
+      ),
+      lastSeatTokenToBetOnTheRiver:
+        table.bettingRound === "river" ? data.seatToken : undefined,
+      seats: table.seats.map((s) => {
+        return s.token === data.seatToken
+          ? {
+              ...s,
+              chipCount: s.chipCount - data.betChipCount,
+              chipsBetCount: s.chipsBetCount + data.betChipCount,
+            }
+          : s;
+      }),
+    },
+    data: { seatIndex },
+  });
 };
 
 interface CallOptions {
@@ -353,7 +351,7 @@ const endTurnMutator: TableMutatorFunction<EndTurnOptions> = ({
   );
 
   if (seatsWithMoneyToBet.length < 2) {
-    // Only 1 seat with money remaining to bet. Skip to
+    // Only 1 seat with money remaining to bet. Skip to end
     let mutatedTable = table;
     while (mutatedTable.bettingRound !== "pre-deal") {
       mutatedTable = endRoundMutator({ table: mutatedTable, data: {} });
@@ -544,6 +542,7 @@ export const awardWinnersMutator: TableMutatorFunction<AwardWinnersOptions> = ({
   const chipsInPotTable = moveBetsToPotMutator({ table, data: {} });
 
   const winningHands = findHighestHands(remainingHands);
+
   const winningSeats = winningHands.map(
     (hand) => remainingSeatsWithChips[hand.candidateIndex]
   );
