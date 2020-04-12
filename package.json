@@ -24,7 +24,7 @@
     "@types/express": "4.17.6",
     "express": "4.17.1",
     "poker-cards": "https://github.com/desmondmc/poker-cards#ba89df2fdd86c1d875db130a9a27c46bfe562dc1",
-    "poker-messages": "https://github.com/easy-poker/poker-messages#3f7f64565571e087c9818762bd9478cc5fbf1437",
+    "poker-messages": "https://github.com/easy-poker/poker-messages#b220ec5acf71d3480665f8709e2f12e4f5cb9ccb",
     "ws": "^7.2.3"
   },
   "devDependencies": {
