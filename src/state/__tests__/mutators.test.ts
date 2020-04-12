@@ -196,7 +196,7 @@ describe("mutators", () => {
       expect(mutatedTable).toBe(table);
     });
 
-    it("Ignores the bet if the bet is lower than the highest bet currently at the table", () => {
+    it("Ignores the bet if the bet is not more than the highest bet currently at the table. If the bet is equal the player should use call, not bet.", () => {
       const table = createMockTable(100);
       // @ts-ignore
       table.turnToBetIndex = 1;
@@ -210,7 +210,7 @@ describe("mutators", () => {
 
       const mutatedTable = placeBetMutator({
         table,
-        data: { seatToken: "b", betChipCount: 9 },
+        data: { seatToken: "b", betChipCount: 10 },
       });
 
       expect(mutatedTable).toBe(table);
@@ -234,6 +234,39 @@ describe("mutators", () => {
       });
 
       expect(mutatedTable).toBe(table);
+    });
+
+    it("Sets the correct roundTerminatingSeatIndex when a player at the table is all in", () => {
+      const table = createMockTable(100);
+
+      // @ts-ignore
+      table.seats = [table.seats[0], table.seats[1], table.seats[2]];
+
+      // @ts-ignore
+      table.seats[0].chipCount = 0;
+      // @ts-ignore
+      table.seats[1].chipCount = 50;
+      // @ts-ignore
+      table.seats[2].chipCount = 100;
+
+      // @ts-ignore
+      table.seats[0].chipsBetCount = 20;
+      // @ts-ignore
+      table.seats[1].chipsBetCount = 0;
+      // @ts-ignore
+      table.seats[2].chipsBetCount = 0;
+
+      // @ts-ignore
+      table.turnToBetIndex = 1;
+
+      const mutatedTable = placeBetMutator({
+        table,
+        data: { seatToken: "b", betChipCount: 40 },
+      });
+
+      expect(mutatedTable).not.toBe(table);
+      expect(mutatedTable.turnToBetIndex).toBe(2);
+      expect(mutatedTable.roundTerminatingSeatIndex).toBe(2);
     });
 
     it("Allows a bet to be lower the the current highest bet if it's an all in.", () => {
@@ -659,7 +692,7 @@ describe("mutators", () => {
       table.seats[0].chipCount = 0;
       // @ts-ignore
       table.seats[0].chipsBetCount = 20;
-      
+
       const tokenAWinsDeck: Cards = [
         [Face.Ace, Suit.Diamonds],
         [Face.Ace, Suit.Clubs],
@@ -669,10 +702,13 @@ describe("mutators", () => {
         [Face.Ace, Suit.Hearts],
         [Face.Ace, Suit.Spades],
         [Face.Jack, Suit.Spades],
-        [Face.Nine, Suit.Diamonds]
+        [Face.Nine, Suit.Diamonds],
       ];
 
-      const deltTable = dealMutator({ table, data: { seatToken: "a", deck: tokenAWinsDeck } });
+      const deltTable = dealMutator({
+        table,
+        data: { seatToken: "a", deck: tokenAWinsDeck },
+      });
 
       // @ts-ignore
       deltTable.seats[0].pocketCards = [
@@ -691,7 +727,10 @@ describe("mutators", () => {
       // @ts-ignore
       deltTable.roundTerminatingSeatIndex = 1;
 
-      const mutatedTable = callMutator({ table: deltTable, data: { seatToken: "b" } });
+      const mutatedTable = callMutator({
+        table: deltTable,
+        data: { seatToken: "b" },
+      });
 
       expect(mutatedTable.bettingRound).toBe("pre-deal");
       expect(mutatedTable.seats[0].chipCount).toBe(40);

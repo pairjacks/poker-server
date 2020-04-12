@@ -156,7 +156,7 @@ export const indexOfFirstNonBustSeatToRightOfIndex = (
   return index;
 };
 
-export const indexOfFirstNonFoldedSeatRightOfSeatIndex = (
+export const indexOfFirstNonFoldedNonAllInSeatRightOfSeatIndex = (
   table: Table,
   index: number
 ): number => {
@@ -166,7 +166,9 @@ export const indexOfFirstNonFoldedSeatRightOfSeatIndex = (
     index
   );
   while (counter < table.seats.length) {
-    if (!table.seats[nextPotentialPlayerIndex].isFolded) {
+    const seat = table.seats[nextPotentialPlayerIndex];
+
+    if (!seat.isFolded && seat.chipCount) {
       return nextPotentialPlayerIndex;
     }
 
@@ -208,7 +210,7 @@ export const indexOfFirstNonBustSeatToLeftOfIndex = (
   return index;
 };
 
-export const indexOfFirstNonFoldedSeatLeftOfSeatIndex = (
+export const indexOfFirstNonFoldedNonAllInSeatLeftOfSeatIndex = (
   table: Table,
   index: number
 ): number => {

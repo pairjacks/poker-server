@@ -3,12 +3,12 @@ import {
   drawCardsFromDeck,
   findHighestHands,
 } from "poker-cards";
-import { Table, Player, Seat, SplitPot } from "./global";
+import { Table, Player, Seat } from "./global";
 import {
   indexOfFirstNonBustSeatToLeftOfIndex,
   findHighestBetAtTable,
-  indexOfFirstNonFoldedSeatLeftOfSeatIndex,
-  indexOfFirstNonFoldedSeatRightOfSeatIndex,
+  indexOfFirstNonFoldedNonAllInSeatLeftOfSeatIndex,
+  indexOfFirstNonFoldedNonAllInSeatRightOfSeatIndex,
   getSeatsThatWentAllInLowestToHighestBet,
 } from "./utils";
 
@@ -179,14 +179,14 @@ export const placeBetMutator: TableMutatorFunction<PlaceBetOptions> = ({
   const minimumChipsToPlay = findHighestBetAtTable(table);
 
   if (
-    seat.chipsBetCount + data.betChipCount < minimumChipsToPlay &&
+    seat.chipsBetCount + data.betChipCount <= minimumChipsToPlay &&
     seat.chipCount !== data.betChipCount
   ) {
     // They didn't bet enough and this is not an all in.
     return table;
   }
 
-  const nextSeatTurnIndex = indexOfFirstNonFoldedSeatLeftOfSeatIndex(
+  const nextSeatTurnIndex = indexOfFirstNonFoldedNonAllInSeatLeftOfSeatIndex(
     table,
     seatIndex
   );
@@ -194,7 +194,7 @@ export const placeBetMutator: TableMutatorFunction<PlaceBetOptions> = ({
   return {
     ...table,
     turnToBetIndex: nextSeatTurnIndex,
-    roundTerminatingSeatIndex: indexOfFirstNonFoldedSeatRightOfSeatIndex(
+    roundTerminatingSeatIndex: indexOfFirstNonFoldedNonAllInSeatRightOfSeatIndex(
       table,
       seatIndex
     ),
@@ -285,7 +285,7 @@ export const foldMutator: TableMutatorFunction<FoldOptions> = ({
     return table;
   }
 
-  const nextSeatTurnIndex = indexOfFirstNonFoldedSeatLeftOfSeatIndex(
+  const nextSeatTurnIndex = indexOfFirstNonFoldedNonAllInSeatLeftOfSeatIndex(
     table,
     seatIndex
   );
@@ -333,7 +333,7 @@ const endTurnMutator: TableMutatorFunction<EndTurnOptions> = ({
   data,
 }): Table => {
   if (data.seatIndex !== table.roundTerminatingSeatIndex) {
-    const nextSeatTurnIndex = indexOfFirstNonFoldedSeatLeftOfSeatIndex(
+    const nextSeatTurnIndex = indexOfFirstNonFoldedNonAllInSeatLeftOfSeatIndex(
       table,
       data.seatIndex
     );
@@ -373,11 +373,11 @@ export const endRoundMutator: TableMutatorFunction<EndRoundOptions> = ({
     case "pre-flop": {
       const { cards, deck } = drawCardsFromDeck(table.deck, 3);
 
-      const turnToBetIndex = indexOfFirstNonFoldedSeatLeftOfSeatIndex(
+      const turnToBetIndex = indexOfFirstNonFoldedNonAllInSeatLeftOfSeatIndex(
         table,
         table.dealerIndex
       );
-      const roundTerminatingSeatIndex = indexOfFirstNonFoldedSeatRightOfSeatIndex(
+      const roundTerminatingSeatIndex = indexOfFirstNonFoldedNonAllInSeatRightOfSeatIndex(
         table,
         turnToBetIndex
       );
@@ -397,11 +397,11 @@ export const endRoundMutator: TableMutatorFunction<EndRoundOptions> = ({
 
     case "flop": {
       const { cards, deck } = drawCardsFromDeck(table.deck, 1);
-      const turnToBetIndex = indexOfFirstNonFoldedSeatLeftOfSeatIndex(
+      const turnToBetIndex = indexOfFirstNonFoldedNonAllInSeatLeftOfSeatIndex(
         table,
         table.dealerIndex
       );
-      const roundTerminatingSeatIndex = indexOfFirstNonFoldedSeatRightOfSeatIndex(
+      const roundTerminatingSeatIndex = indexOfFirstNonFoldedNonAllInSeatRightOfSeatIndex(
         table,
         turnToBetIndex
       );
@@ -421,11 +421,11 @@ export const endRoundMutator: TableMutatorFunction<EndRoundOptions> = ({
 
     case "turn": {
       const { cards, deck } = drawCardsFromDeck(table.deck, 1);
-      const turnToBetIndex = indexOfFirstNonFoldedSeatLeftOfSeatIndex(
+      const turnToBetIndex = indexOfFirstNonFoldedNonAllInSeatLeftOfSeatIndex(
         table,
         table.dealerIndex
       );
-      const roundTerminatingSeatIndex = indexOfFirstNonFoldedSeatRightOfSeatIndex(
+      const roundTerminatingSeatIndex = indexOfFirstNonFoldedNonAllInSeatRightOfSeatIndex(
         table,
         turnToBetIndex
       );
@@ -471,6 +471,22 @@ export const endHandMutator: TableMutatorFunction<EndHandOptions> = ({
         isBust: s.chipCount === 0,
       };
     }),
+  };
+};
+
+interface RevealHandsOptions {}
+
+export const revealHandsMutator: TableMutatorFunction<RevealHandsOptions> = ({
+  table,
+}): Table => {
+  const unfoldedSeats = table.seats.filter(s => !s.isBust && !s.isFolded);
+
+  if (unfoldedSeats.length < 2) {
+    return table;
+  }
+
+  return {
+    ...table,
   };
 };
 
