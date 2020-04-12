@@ -2,7 +2,7 @@ import WebSocket from "ws";
 import { getTable, saveTable } from "../../state/global";
 import { sendTableStateMessage, sendMessage } from "../outbound";
 import { removePlayerFromTableMutator } from "../../state/mutators";
-import { ClientLeaveTableMessage } from "poker-messages";
+import { ClientLeaveTableMessage } from "@pairjacks/poker-messages";
 
 export const leaveTable = (ws: WebSocket, data: ClientLeaveTableMessage) => {
   const table = getTable(data.tableName);

@@ -6,7 +6,7 @@ import { leaveTable } from "./handlers/leaveTable";
 import { startGame } from "./handlers/startGame";
 import { placeBet } from "./handlers/placeBet";
 import { deal } from "./handlers/deal";
-import { isClientMessage } from "poker-messages";
+import { isClientMessage } from "@pairjacks/poker-messages";
 import { fold } from "./handlers/fold";
 import { call } from "./handlers/call";
 import { check } from "./handlers/check";

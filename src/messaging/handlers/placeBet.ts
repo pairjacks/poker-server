@@ -2,7 +2,7 @@ import WebSocket from "ws";
 import { getTable, saveTable } from "../../state/global";
 import { sendTableStateMessage } from "../outbound";
 import { placeBetMutator } from "../../state/mutators";
-import { ClientPlaceBetMessage } from "poker-messages";
+import { ClientPlaceBetMessage } from "@pairjacks/poker-messages";
 
 export const placeBet = (ws: WebSocket, message: ClientPlaceBetMessage) => {
   const table = getTable(message.tableName);

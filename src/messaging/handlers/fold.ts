@@ -2,7 +2,7 @@ import WebSocket from "ws";
 import { getTable, saveTable } from "../../state/global";
 import { sendTableStateMessage } from "../outbound";
 import { foldMutator } from "../../state/mutators";
-import { ClientFoldMessage } from "poker-messages";
+import { ClientFoldMessage } from "@pairjacks/poker-messages";
 
 export const fold = (ws: WebSocket, message: ClientFoldMessage) => {
   const table = getTable(message.tableName);

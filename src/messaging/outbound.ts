@@ -1,7 +1,7 @@
 import WebSocket from "ws";
 import { Table } from "../state/global";
 import { stripPrivateTableDataForSeat } from "../state/utils";
-import { ServerMessage, ServerTableStateMessage } from "poker-messages";
+import { ServerMessage, ServerTableStateMessage } from "@pairjacks/poker-messages";
 
 const socketDisplayNameMap: { [displayName: string]: WebSocket } = {};
 

@@ -8,7 +8,7 @@ import {
 } from "../outbound";
 import { addPlayerToTableMutator } from "../../state/mutators";
 import { randomDisplayName } from "../../state/utils";
-import { ClientJoinTableMessage } from "poker-messages";
+import { ClientJoinTableMessage } from "@pairjacks/poker-messages";
 
 export const joinTable = (
   ws: WebSocket,

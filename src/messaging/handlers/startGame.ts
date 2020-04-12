@@ -2,7 +2,7 @@ import WebSocket from "ws";
 import { getTable, saveTable } from "../../state/global";
 import { sendTableStateMessage } from "../outbound";
 import { startGameMutator } from "../../state/mutators";
-import { ClientStartGameMessage } from "poker-messages";
+import { ClientStartGameMessage } from "@pairjacks/poker-messages";
 
 export const startGame = async (
   ws: WebSocket,

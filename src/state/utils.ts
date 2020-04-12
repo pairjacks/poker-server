@@ -1,5 +1,5 @@
 import { Table, Seat } from "./global";
-import { LimitedTable } from "poker-messages";
+import { LimitedTable } from "@pairjacks/poker-messages";
 
 /**
  * mod function that works correctly with negative numbers.

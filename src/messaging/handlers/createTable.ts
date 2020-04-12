@@ -7,7 +7,7 @@ import {
   unregisterWebsocket,
 } from "../outbound";
 import { randomDisplayName } from "../../state/utils";
-import { ClientCreateTableMessage } from "poker-messages";
+import { ClientCreateTableMessage } from "@pairjacks/poker-messages";
 
 export const createTable = (ws: WebSocket, data: ClientCreateTableMessage) => {
   const creatorSeatToken = generateSeatToken();

@@ -24,7 +24,7 @@
     "@pairjacks/poker-cards": "0.1.0",
     "@types/express": "4.17.6",
     "express": "4.17.1",
-    "poker-messages": "https://github.com/pairjacks/poker-messages#60da38f8711475e1320864050f25802c7022a6c8",
+    "@pairjacks/poker-messages": "0.1.0",
     "ws": "^7.2.3"
   },
   "devDependencies": {
