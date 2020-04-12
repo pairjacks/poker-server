@@ -228,6 +228,10 @@ export const callMutator: TableMutatorFunction<CallOptions> = ({
   const costToPlay = findHighestBetAtTable(table);
   const chipsToPay = costToPlay - seat.chipsBetCount;
 
+  if (chipsToPay > seat.chipCount) {
+    return table;
+  }
+
   return endTurnMutator({
     table: {
       ...table,

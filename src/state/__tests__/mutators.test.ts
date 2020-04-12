@@ -636,6 +636,19 @@ describe("mutators", () => {
   });
 
   describe("callMutator", () => {
+    it("Ignores the action if calling involves betting more chips than the user has", () => {
+      const table = createMockTable(20);
+
+      // @ts-ignore
+      table.seats[0].chipsBetCount = 21;
+      // @ts-ignore
+      table.turnToBetIndex = 1;
+
+      const mutatedTable = callMutator({ table, data: { seatToken: "b" } });
+
+      expect(mutatedTable).toBe(table);
+    });
+
     it("Skips right to the end of the round if no more betting is possible after call because 1 or less players still playing the hand have money to bet", () => {
       const table = createMockTable(20);
 
