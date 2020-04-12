@@ -150,6 +150,7 @@ export const dealMutator: TableMutatorFunction<DealOptions> = ({
     revealPocketIndexs: [],
     turnToBetIndex: firstTurnIndex,
     roundTerminatingSeatIndex: bigBlindIndex,
+    lastSeatTokenToBetOnTheRiver: undefined,
   };
 };
 
@@ -195,6 +196,8 @@ export const placeBetMutator: TableMutatorFunction<PlaceBetOptions> = ({
       table,
       seatIndex
     ),
+    lastSeatTokenToBetOnTheRiver:
+      table.bettingRound === "river" ? data.seatToken : undefined,
     seats: table.seats.map((s) => {
       return s.token === data.seatToken
         ? {
@@ -305,9 +308,10 @@ export const foldMutator: TableMutatorFunction<FoldOptions> = ({
     // Only one player left in the hand. The hand is over.
     const winningSeatToken = unfoldedSeats[0].token;
     const awardedTable = awardWinnersMutator({
-      table,
+      table: tableWithFoldedSeat,
       data: { winningSeatToken },
     });
+
     return endHandMutator({ table: awardedTable, data: {} });
   }
 
@@ -496,14 +500,16 @@ export const revealWinningHandsMutator: TableMutatorFunction<RevealWinningHandsO
     return unfoldedSeats[hand.candidateIndex].token;
   });
 
-  const winningIndexs = winningTokens.reduce((accu, token) => {
+  const revealPocketTokens = [...winningTokens, table.lastSeatTokenToBetOnTheRiver];
+
+  const revealPocketIndexs = revealPocketTokens.reduce((accu, token) => {
     const index = table.seats.findIndex((s) => s.token === token);
     return index === -1 ? accu : [...accu, index];
   }, [] as number[]);
 
   return {
     ...table,
-    revealPocketIndexs: winningIndexs,
+    revealPocketIndexs,
   };
 };
 

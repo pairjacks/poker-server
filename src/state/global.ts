@@ -17,6 +17,7 @@ export interface Table {
   readonly roundTerminatingSeatIndex: number;
   readonly turnToBetIndex?: number;
   readonly revealPocketIndexs: number[];
+  readonly lastSeatTokenToBetOnTheRiver?: string;
 
   readonly seats: Seat[];
 
