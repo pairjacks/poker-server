@@ -25,9 +25,9 @@ export const stripPrivateTableDataForSeat = ({
     name: table.name,
     bettingRound: table.bettingRound,
     potChipCount: table.mainPotChipCount,
-    splitPots: table.splitPots.map(sp => {
-      const players = sp.seatTokens.map(seatToken => {
-        const seat = table.seats.find(s => s.token === seatToken);
+    splitPots: table.splitPots.map((sp) => {
+      const players = sp.seatTokens.map((seatToken) => {
+        const seat = table.seats.find((s) => s.token === seatToken);
 
         return seat?.player?.displayName || "unknown player";
       });
@@ -35,7 +35,7 @@ export const stripPrivateTableDataForSeat = ({
       return {
         players,
         chipCount: sp.chipCount,
-      }
+      };
     }),
     communityCards: table.communityCards,
     seats: table.seats.map((s, index) => ({
@@ -57,54 +57,92 @@ export const stripPrivateTableDataForSeat = ({
 };
 
 export const randomDisplayName = () => {
-  const presidents = [
-    "George Washington",
-    "John Adams",
-    "Thomas Jefferson",
-    "James Madison",
-    "James Monroe",
-    "John Quincy Adams",
-    "Andrew Jackson",
-    "Martin Van Buren",
-    "William Henry Harrison",
-    "John Tyler",
-    "James K. Polk",
-    "Zachary Taylor",
-    "Millard Fillmore",
-    "Franklin Pierce",
-    "James Buchanan",
-    "Abraham Lincoln",
-    "Andrew Johnson",
-    "Ulysses S. Grant",
-    "Rutherford B. Hayes",
-    "James A. Garfield",
-    "Chester A. Arthur",
-    "Grover Cleveland",
-    "Benjamin Harrison",
-    "William McKinley",
-    "Theodore Roosevelt",
-    "William Howard Taft",
-    "Woodrow Wilson",
-    "Warren G. Harding",
-    "Calvin Coolidge",
-    "Herbert Hoover",
-    "Franklin D. Roosevelt",
-    "Harry S Truman",
-    "Dwight D. Eisenhower",
-    "John F. Kennedy",
-    "Lyndon B. Johnson",
-    "Richard Nixon",
-    "Gerald Ford",
-    "Jimmy Carter",
-    "Ronald Reagan",
-    "George H. W. Bush",
-    "Bill Clinton",
-    "George W. Bush",
-    "Barack Obama",
-    "Donald Trump",
+  const emojis = [
+    "👨‍🎨",
+    "🕵️‍♂️",
+    "🎃",
+    "😈",
+    "👹",
+    "😼",
+    "💂‍♀️",
+    "👩‍⚕️",
+    "👨‍🌾",
+    "👮‍♂️",
+    "🧕",
+    "🧑‍🍳",
+    "🧑‍🎤",
+    "👩‍🎤",
+    "👨‍🎤",
+    "👩‍🎓",
+    "👩‍🏫",
+    "👨‍🚀",
+    "👸🏻",
+    "🤴",
+    "🦹‍♂️",
+    "🦸‍♀️",
+    "🤶",
+    "🎅",
+    "🧜🏻‍♀️",
+    "🧙‍♂️",
+    "🧝‍♀️",
+    "🧝",
+    "🧛‍♂️",
+    "🧟‍♂️",
+    "🧞‍♂️",
+    "💃",
+    "🕺",
+    "🧖‍♂️",
+    "🦊",
   ];
 
-  return presidents[Math.floor(Math.random() * presidents.length)];
+  // const presidents = [
+  //   "George Washington",
+  //   "John Adams",
+  //   "Thomas Jefferson",
+  //   "James Madison",
+  //   "James Monroe",
+  //   "John Quincy Adams",
+  //   "Andrew Jackson",
+  //   "Martin Van Buren",
+  //   "William Henry Harrison",
+  //   "John Tyler",
+  //   "James K. Polk",
+  //   "Zachary Taylor",
+  //   "Millard Fillmore",
+  //   "Franklin Pierce",
+  //   "James Buchanan",
+  //   "Abraham Lincoln",
+  //   "Andrew Johnson",
+  //   "Ulysses S. Grant",
+  //   "Rutherford B. Hayes",
+  //   "James A. Garfield",
+  //   "Chester A. Arthur",
+  //   "Grover Cleveland",
+  //   "Benjamin Harrison",
+  //   "William McKinley",
+  //   "Theodore Roosevelt",
+  //   "William Howard Taft",
+  //   "Woodrow Wilson",
+  //   "Warren G. Harding",
+  //   "Calvin Coolidge",
+  //   "Herbert Hoover",
+  //   "Franklin D. Roosevelt",
+  //   "Harry S Truman",
+  //   "Dwight D. Eisenhower",
+  //   "John F. Kennedy",
+  //   "Lyndon B. Johnson",
+  //   "Richard Nixon",
+  //   "Gerald Ford",
+  //   "Jimmy Carter",
+  //   "Ronald Reagan",
+  //   "George H. W. Bush",
+  //   "Bill Clinton",
+  //   "George W. Bush",
+  //   "Barack Obama",
+  //   "Donald Trump",
+  // ];
+
+  return emojis[Math.floor(Math.random() * emojis.length)];
 };
 
 /**
@@ -240,12 +278,9 @@ export const indexOfFirstNonFoldedNonAllInSeatLeftOfSeatIndex = (
 export const getSeatsThatWentAllInLowestToHighestBet = (
   table: Table
 ): Seat[] => {
-  const seats = table.seats.filter(
-    (s) => s.chipsBetCount && s.chipCount === 0
-  );
+  const seats = table.seats.filter((s) => s.chipsBetCount && s.chipCount === 0);
 
-  seats.sort((s1, s2) => s1.chipsBetCount - s2.chipsBetCount)
+  seats.sort((s1, s2) => s1.chipsBetCount - s2.chipsBetCount);
 
   return seats;
 };
-
