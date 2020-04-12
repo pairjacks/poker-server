@@ -5,6 +5,7 @@
   "main": "built/index.js",
   "scripts": {
     "start": "node built/index.js",
+    "postinstall": "npm run tsc",
     "test": "jest",
     "tsc": "tsc",
     "types": "tsc --skipLibCheck"
