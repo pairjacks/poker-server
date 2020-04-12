@@ -48,7 +48,7 @@ export const stripPrivateTableDataForSeat = ({
       chipsBetCount: s.chipsBetCount,
       pocketCards:
         s.token === playerSeat?.token ||
-        table.revealPocketIndexs.includes(index)
+        table.revealPocketIndeces.includes(index)
           ? s.pocketCards
           : undefined,
       player: s.player,

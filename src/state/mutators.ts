@@ -1,4 +1,8 @@
-import { Cards, drawCardsFromDeck, findHighestHands } from "poker-cards";
+import {
+  Cards,
+  drawCardsFromDeck,
+  findHighestHands,
+} from "@pairjacks/poker-cards";
 import { Table, Player, Seat } from "./global";
 import {
   indexOfFirstNonBustSeatToLeftOfIndex,
@@ -147,7 +151,7 @@ export const dealMutator: TableMutatorFunction<DealOptions> = ({
     seats: withPockets.seats.map((s) => ({ ...s, isFolded: s.isBust })),
     deck: withPockets.deck,
     communityCards: [],
-    revealPocketIndexs: [],
+    revealPocketIndeces: [],
     turnToBetIndex: firstTurnIndex,
     roundTerminatingSeatIndex: bigBlindIndex,
     lastSeatTokenToBetOnTheRiver: undefined,
@@ -500,7 +504,10 @@ export const revealWinningHandsMutator: TableMutatorFunction<RevealWinningHandsO
     return unfoldedSeats[hand.candidateIndex].token;
   });
 
-  const revealPocketTokens = [...winningTokens, table.lastSeatTokenToBetOnTheRiver];
+  const revealPocketTokens = [
+    ...winningTokens,
+    table.lastSeatTokenToBetOnTheRiver,
+  ];
 
   const revealPocketIndexs = revealPocketTokens.reduce((accu, token) => {
     const index = table.seats.findIndex((s) => s.token === token);
@@ -509,7 +516,7 @@ export const revealWinningHandsMutator: TableMutatorFunction<RevealWinningHandsO
 
   return {
     ...table,
-    revealPocketIndexs,
+    revealPocketIndeces: revealPocketIndexs,
   };
 };
 

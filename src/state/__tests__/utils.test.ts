@@ -1,5 +1,5 @@
+import { Face, Suit } from "@pairjacks/poker-cards";
 import { getSeatsThatWentAllInLowestToHighestBet } from "../utils";
-import { Face, Suit } from "poker-cards";
 import { Table } from "../global";
 
 export const createMockTable = (startingChipCount: number): Table => {
@@ -13,6 +13,7 @@ export const createMockTable = (startingChipCount: number): Table => {
     dealerIndex: 0,
     turnToBetIndex: 0,
     smallBlind: 1,
+    revealPocketIndeces: [],
     deck: [
       [Face.Ace, Suit.Hearts],
       [Face.Ace, Suit.Diamonds],

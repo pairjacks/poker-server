@@ -1,3 +1,4 @@
+import { Face, Suit, Cards } from "@pairjacks/poker-cards";
 import {
   placeBetMutator,
   dealMutator,
@@ -7,7 +8,6 @@ import {
   awardWinnersMutator,
   callMutator,
 } from "../mutators";
-import { Face, Suit, Cards } from "poker-cards";
 import { mod } from "../utils";
 import { Table } from "../global";
 
@@ -33,7 +33,7 @@ export const createMockTable = (startingChipCount: number): Table => {
     splitPots: [],
     dealerIndex: 0,
     turnToBetIndex: 0,
-    revealPocketIndexs: [],
+    revealPocketIndeces: [],
     smallBlind: 1,
     deck: mockDeck,
     communityCards: [],

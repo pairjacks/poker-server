@@ -1,4 +1,4 @@
-import { Cards } from "poker-cards";
+import { Cards } from "@pairjacks/poker-cards";
 
 /**
  * Table contains the entire state of a poker table
@@ -16,7 +16,7 @@ export interface Table {
   readonly dealerIndex: number;
   readonly roundTerminatingSeatIndex: number;
   readonly turnToBetIndex?: number;
-  readonly revealPocketIndexs: number[];
+  readonly revealPocketIndeces: number[];
   readonly lastSeatTokenToBetOnTheRiver?: string;
 
   readonly seats: Seat[];
