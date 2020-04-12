@@ -33,6 +33,7 @@ export const createMockTable = (startingChipCount: number): Table => {
     splitPots: [],
     dealerIndex: 0,
     turnToBetIndex: 0,
+    revealPocketIndexs: [],
     smallBlind: 1,
     deck: mockDeck,
     communityCards: [],

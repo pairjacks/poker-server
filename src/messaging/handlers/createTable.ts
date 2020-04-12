@@ -32,6 +32,7 @@ export const createTable = (
     dealerIndex: 0,
     turnToBetIndex: 0,
     roundTerminatingSeatIndex: 0,
+    revealPocketIndexs: [],
     smallBlind: smallBlind,
     deck: [],
     communityCards: [],

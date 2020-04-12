@@ -1,8 +1,4 @@
-import {
-  Cards,
-  drawCardsFromDeck,
-  findHighestHands,
-} from "poker-cards";
+import { Cards, drawCardsFromDeck, findHighestHands } from "poker-cards";
 import { Table, Player, Seat } from "./global";
 import {
   indexOfFirstNonBustSeatToLeftOfIndex,
@@ -151,6 +147,7 @@ export const dealMutator: TableMutatorFunction<DealOptions> = ({
     seats: withPockets.seats.map((s) => ({ ...s, isFolded: s.isBust })),
     deck: withPockets.deck,
     communityCards: [],
+    revealPocketIndexs: [],
     turnToBetIndex: firstTurnIndex,
     roundTerminatingSeatIndex: bigBlindIndex,
   };
@@ -458,13 +455,18 @@ interface EndHandOptions {}
 export const endHandMutator: TableMutatorFunction<EndHandOptions> = ({
   table,
 }): Table => {
+  const revealHandTable = revealWinningHandsMutator({ table, data: {} });
+
   return {
-    ...table,
+    ...revealHandTable,
     bettingRound: "pre-deal",
-    dealerIndex: indexOfFirstNonBustSeatToLeftOfIndex(table, table.dealerIndex),
+    dealerIndex: indexOfFirstNonBustSeatToLeftOfIndex(
+      revealHandTable,
+      revealHandTable.dealerIndex
+    ),
     turnToBetIndex: undefined,
     splitPots: [],
-    seats: table.seats.map((s) => {
+    seats: revealHandTable.seats.map((s) => {
       return {
         ...s,
         isFolded: false,
@@ -474,19 +476,34 @@ export const endHandMutator: TableMutatorFunction<EndHandOptions> = ({
   };
 };
 
-interface RevealHandsOptions {}
+interface RevealWinningHandsOptions {}
 
-export const revealHandsMutator: TableMutatorFunction<RevealHandsOptions> = ({
+export const revealWinningHandsMutator: TableMutatorFunction<RevealWinningHandsOptions> = ({
   table,
 }): Table => {
-  const unfoldedSeats = table.seats.filter(s => !s.isBust && !s.isFolded);
+  const unfoldedSeats = table.seats.filter((s) => !s.isBust && !s.isFolded);
 
   if (unfoldedSeats.length < 2) {
     return table;
   }
 
+  const remainingHands = unfoldedSeats.map((s) => ({
+    pocketCards: s.pocketCards,
+    communityCards: table.communityCards,
+  }));
+
+  const winningTokens = findHighestHands(remainingHands).map((hand) => {
+    return unfoldedSeats[hand.candidateIndex].token;
+  });
+
+  const winningIndexs = winningTokens.reduce((accu, token) => {
+    const index = table.seats.findIndex((s) => s.token === token);
+    return index === -1 ? accu : [...accu, index];
+  }, [] as number[]);
+
   return {
     ...table,
+    revealPocketIndexs: winningIndexs,
   };
 };
 

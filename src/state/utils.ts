@@ -46,7 +46,11 @@ export const stripPrivateTableDataForSeat = ({
       isBust: s.isBust,
       chipCount: s.chipCount,
       chipsBetCount: s.chipsBetCount,
-      pocketCards: playerSeat?.pocketCards,
+      pocketCards:
+        s.token === playerSeat?.token ||
+        table.revealPocketIndexs.includes(index)
+          ? s.pocketCards
+          : undefined,
       player: s.player,
     })),
     currentUser: {

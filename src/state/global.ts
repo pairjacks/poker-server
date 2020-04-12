@@ -16,6 +16,7 @@ export interface Table {
   readonly dealerIndex: number;
   readonly roundTerminatingSeatIndex: number;
   readonly turnToBetIndex?: number;
+  readonly revealPocketIndexs: number[];
 
   readonly seats: Seat[];
 
