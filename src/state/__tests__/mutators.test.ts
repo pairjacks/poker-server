@@ -7,6 +7,7 @@ import {
   moveBetsToPotMutator,
   awardWinnersMutator,
   callMutator,
+  foldMutator,
 } from "../mutators";
 import { mod } from "../utils";
 import { Table } from "../global";
@@ -30,6 +31,7 @@ export const createMockTable = (startingChipCount: number): Table => {
     bettingRound: "pre-deal",
     roundTerminatingSeatIndex: 0,
     mainPotChipCount: 0,
+    maxBetChipCount: 4 * startingChipCount,
     splitPots: [],
     dealerIndex: 0,
     turnToBetIndex: 0,
@@ -328,7 +330,7 @@ describe("mutators", () => {
       expect(mutatedTable.roundTerminatingSeatIndex).toBe(3);
     });
 
-    it.only("plays skips to the end of the game in heads up poker both players go all in", () => {
+    it("plays skips to the end of the game in heads up poker both players go all in", () => {
       const table = createMockTable(50);
 
       // @ts-ignore
@@ -394,6 +396,53 @@ describe("mutators", () => {
       expect(table2.mainPotChipCount).toBe(0);
       expect(table2.splitPots).toEqual([]);
       expect(table2.seats[0].chipCount).toBe(154);
+    });
+  });
+
+  describe("foldMutator", () => {
+    it("Folds properly and rewards the right winning in heads up poker", () => {
+      const table = createMockTable(0);
+
+      // @ts-ignore
+      table.deck = [
+        [Face.Two, Suit.Hearts],
+        [Face.Seven, Suit.Diamonds],
+        [Face.Four, Suit.Clubs],
+        [Face.Nine, Suit.Spades],
+        [Face.Five, Suit.Hearts],
+        [Face.Jack, Suit.Diamonds],
+        [Face.Two, Suit.Clubs],
+        [Face.Seven, Suit.Spades],
+        [Face.Queen, Suit.Spades],
+      ];
+      
+      table.bettingRound = "pre-flop";
+
+      table.seats = [table.seats[0], table.seats[1]];
+
+      table.seats[0].chipCount = 100;
+      table.seats[0].chipsBetCount = 2;
+      // @ts-ignore
+      table.seats[0].pocketCards = [
+        [Face.King, Suit.Diamonds],
+        [Face.King, Suit.Clubs],
+      ];
+
+      table.seats[1].chipCount = 0;
+      table.seats[1].chipsBetCount = 6;
+      // @ts-ignore
+      table.seats[1].pocketCards = [
+        [Face.Ace, Suit.Diamonds],
+        [Face.Ace, Suit.Clubs],
+      ];
+
+      table.turnToBetIndex = 0;
+
+      const mutatedTable = foldMutator({ table, data: { seatToken: "a" } });
+
+      expect(mutatedTable).not.toBe(table);
+      expect(mutatedTable.bettingRound).toBe("pre-deal");
+      expect(mutatedTable.seats[1].chipCount).toBe(8);
     });
   });
 

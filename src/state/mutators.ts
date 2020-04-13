@@ -528,8 +528,10 @@ export const awardWinnersMutator: TableMutatorFunction<AwardWinnersOptions> = ({
   );
 
   if (remainingSeatsWithChips.length === 0) {
+    const betInPotTable = moveBetsToPotMutator({ table, data: {} });
+
     return awardSplitPotsMutator({
-      table,
+      table: betInPotTable,
       data: {},
     });
   }
@@ -658,7 +660,7 @@ const createSplitPotsMutator: TableMutatorFunction<CreateSplitPotsOptions> = ({
   }
 
   return seatsThatWentAllInLowestToHighestBet.reduce((table, seat) => {
-    return splitPotForSeatOptionsMutator({
+    return splitPotForSeatMutator({
       table,
       data: { seatToken: seat.token },
     });
@@ -669,7 +671,7 @@ interface SplitPotForSeatOptions {
   seatToken: string;
 }
 
-const splitPotForSeatOptionsMutator: TableMutatorFunction<SplitPotForSeatOptions> = ({
+const splitPotForSeatMutator: TableMutatorFunction<SplitPotForSeatOptions> = ({
   table,
   data,
 }): Table => {
@@ -695,6 +697,11 @@ const splitPotForSeatOptionsMutator: TableMutatorFunction<SplitPotForSeatOptions
       // @ts-ignore
       tableCopy.seats[index].chipsBetCount = s.chipsBetCount - amountToBet;
       newSplitPot.chipCount = newSplitPot.chipCount + amountToBet;
+    } else if (s.isFolded) {
+      newSplitPot.chipCount =
+        newSplitPot.chipCount + tableCopy.seats[index].chipsBetCount;
+      // @ts-ignore
+      tableCopy.seats[index].chipsBetCount = 0;
     }
   });
 
