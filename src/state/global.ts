@@ -11,6 +11,7 @@ export interface Table {
   readonly smallBlind: number;
   readonly bettingRound: BettingRound;
   readonly mainPotChipCount: number;
+  readonly maxBetChipCount: number;
   readonly splitPots: SplitPot[];
 
   readonly dealerIndex: number;

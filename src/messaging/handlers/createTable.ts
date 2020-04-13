@@ -26,6 +26,7 @@ export const createTable = (ws: WebSocket, data: ClientCreateTableMessage) => {
     bettingRound: "pre-deal",
     splitPots: [],
     mainPotChipCount: 0,
+    maxBetChipCount: startingChipCount * numberOfSeats,
     dealerIndex: 0,
     turnToBetIndex: 0,
     roundTerminatingSeatIndex: 0,
