@@ -37,16 +37,13 @@ export type BettingRound = "pre-deal" | "pre-flop" | "flop" | "turn" | "river";
 
 export interface Seat {
   readonly token: string;
+  readonly isEmpty: boolean;
   readonly chipCount: number;
-  readonly player?: Player;
+  readonly displayName: string;
   readonly pocketCards: Cards;
   readonly chipsBetCount: number;
   readonly isFolded: boolean;
   readonly isBust: boolean;
-}
-
-export interface Player {
-  readonly displayName: string;
 }
 
 const redisClient = process.env.REDIS_URL

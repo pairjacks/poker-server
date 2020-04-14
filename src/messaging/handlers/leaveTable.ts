@@ -17,7 +17,7 @@ export const leaveTable = async (ws: WebSocket, data: ClientLeaveTableMessage) =
   await saveTable(mutatedTable);
 
   sendMessage(ws, {
-    type: "table-state",
+    type: "server/table-state",
     table: undefined
   });
 

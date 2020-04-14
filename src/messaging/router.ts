@@ -10,6 +10,7 @@ import { isClientMessage } from "@pairjacks/poker-messages";
 import { fold } from "./handlers/fold";
 import { call } from "./handlers/call";
 import { check } from "./handlers/check";
+import { changeDisplayName } from "./handlers/changeDisplayName";
 
 export const processMessage = (ws: WebSocket, message: any) => {
   if (!isClientMessage(message)) {
@@ -40,6 +41,10 @@ export const processMessage = (ws: WebSocket, message: any) => {
       startGame(ws, message);
       break;
 
+    case "client/change-display-name":
+      changeDisplayName(ws, message);
+      break;
+
     case "client/deal":
       deal(ws, message);
       break;
@@ -51,7 +56,7 @@ export const processMessage = (ws: WebSocket, message: any) => {
     case "client/call":
       call(ws, message);
       break;
-    
+
     case "client/check":
       check(ws, message);
       break;

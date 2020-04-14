@@ -9,7 +9,10 @@ import {
 import { randomDisplayName } from "../../state/utils";
 import { ClientCreateTableMessage } from "@pairjacks/poker-messages";
 
-export const createTable = async (ws: WebSocket, data: ClientCreateTableMessage) => {
+export const createTable = async (
+  ws: WebSocket,
+  data: ClientCreateTableMessage
+) => {
   const creatorSeatToken = generateSeatToken();
   registerWebsocket(ws, creatorSeatToken);
   ws.on("close", () => {
@@ -40,6 +43,8 @@ export const createTable = async (ws: WebSocket, data: ClientCreateTableMessage)
         chipCount: startingChipCount,
         chipsBetCount: 0,
         pocketCards: [],
+        displayName: randomDisplayName(),
+        isEmpty: false,
         isFolded: false,
         isBust: false,
       },
@@ -50,6 +55,8 @@ export const createTable = async (ws: WebSocket, data: ClientCreateTableMessage)
           chipCount: startingChipCount,
           chipsBetCount: 0,
           pocketCards: [],
+          displayName: randomDisplayName(),
+          isEmpty: true,
           isFolded: false,
           isBust: false,
         })),
@@ -61,9 +68,6 @@ export const createTable = async (ws: WebSocket, data: ClientCreateTableMessage)
     table: newTable,
     data: {
       seatToken,
-      player: {
-        displayName: randomDisplayName(),
-      },
     },
   });
 

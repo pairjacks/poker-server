@@ -20,13 +20,13 @@ export const sendMessage = (ws: WebSocket, message: ServerMessage) => {
 
 export const sendTableStateMessage = (table: Table) => {
   table.seats.forEach((s) => {
-    if (s.player) {
+    if (!s.isEmpty) {
       const limitedTable = stripPrivateTableDataForSeat({
         seatToken: s.token,
         table,
       });
       const tableState: ServerTableStateMessage = {
-        type: "table-state",
+        type: "server/table-state",
         table: limitedTable,
       };
       const socket = socketDisplayNameMap[s.token];

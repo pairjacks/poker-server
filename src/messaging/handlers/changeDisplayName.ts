@@ -5,23 +5,24 @@ import {
   registerWebsocket,
   unregisterWebsocket
 } from "../outbound";
-import { addPlayerToTableMutator } from "../../state/mutators";
+import { changeSeatDisplayNameMutator } from "../../state/mutators";
 import { randomDisplayName } from "../../state/utils";
-import { ClientJoinTableMessage } from "@pairjacks/poker-messages";
+import { ClientChangeDisplayNameMessage } from "@pairjacks/poker-messages";
 
-export const joinTable = async (
+export const changeDisplayName = async (
   ws: WebSocket,
-  data: ClientJoinTableMessage
+  data: ClientChangeDisplayNameMessage
 ) => {
   const table = await getTable(data.tableName);
   if (!table.seats.find(s => s.token === data.seatToken)) {
     return;
   }
 
-  const mutatedTable = addPlayerToTableMutator({
+  const mutatedTable = changeSeatDisplayNameMutator({
     table,
     data: {
       seatToken: data.seatToken,
+      displayName: randomDisplayName(),
     }
   });
 

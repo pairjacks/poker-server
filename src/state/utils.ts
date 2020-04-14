@@ -30,7 +30,7 @@ export const stripPrivateTableDataForSeat = ({
       const players = sp.seatTokens.map((seatToken) => {
         const seat = table.seats.find((s) => s.token === seatToken);
 
-        return seat?.player?.displayName || "unknown player";
+        return seat?.displayName || "unknown player";
       });
 
       return {
@@ -41,6 +41,8 @@ export const stripPrivateTableDataForSeat = ({
     communityCards: table.communityCards,
     seats: table.seats.map((s, index) => ({
       token: s.token,
+      isEmpty: s.isEmpty,
+      displayName: s.displayName,
       isDealer: index === table.dealerIndex,
       isTurnToBet: index === table.turnToBetIndex,
       isFolded: s.isFolded,
@@ -52,11 +54,9 @@ export const stripPrivateTableDataForSeat = ({
         table.revealPocketIndeces.includes(index)
           ? s.pocketCards
           : undefined,
-      player: s.player,
     })),
     currentUser: {
       seatToken,
-      displayName: playerSeat?.player?.displayName || "",
     },
   };
 };

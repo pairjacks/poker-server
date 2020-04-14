@@ -3,7 +3,7 @@ import {
   drawCardsFromDeck,
   findHighestHands,
 } from "@pairjacks/poker-cards";
-import { Table, Player, Seat } from "./state";
+import { Table, Seat } from "./state";
 import {
   indexOfFirstNonBustSeatToLeftOfIndex,
   findHighestBetAtTable,
@@ -21,7 +21,6 @@ interface TableMutatorArgs<T> {
 
 interface AddPlayerToTableOptions {
   seatToken: string;
-  player: Player;
 }
 
 export const addPlayerToTableMutator: TableMutatorFunction<AddPlayerToTableOptions> = ({
@@ -32,7 +31,28 @@ export const addPlayerToTableMutator: TableMutatorFunction<AddPlayerToTableOptio
     ...table,
     seats: table.seats.map((s) => {
       if (s.token === data.seatToken) {
-        return { ...s, player: data.player };
+        return { ...s, isEmpty: false };
+      }
+
+      return s;
+    }),
+  };
+};
+
+interface ChangeSeatDisplayNameOptions {
+  seatToken: string;
+  displayName: string;
+}
+
+export const changeSeatDisplayNameMutator: TableMutatorFunction<ChangeSeatDisplayNameOptions> = ({
+  table,
+  data,
+}): Table => {
+  return {
+    ...table,
+    seats: table.seats.map((s) => {
+      if (s.token === data.seatToken) {
+        return { ...s, displayName: data.displayName };
       }
 
       return s;
