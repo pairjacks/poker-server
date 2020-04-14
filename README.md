@@ -1,4 +1,4 @@
-# poker-server# poker-server
+# poker-server
 
 ### dependencies
 1. redis `brew install redis`
