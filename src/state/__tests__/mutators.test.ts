@@ -10,7 +10,7 @@ import {
   foldMutator,
 } from "../mutators";
 import { mod } from "../utils";
-import { Table } from "../global";
+import { Table } from "../state";
 
 const mockDeck: Cards = [
   [Face.Ace, Suit.Hearts],
@@ -416,11 +416,15 @@ describe("mutators", () => {
         [Face.Queen, Suit.Spades],
       ];
       
+      // @ts-ignore
       table.bettingRound = "pre-flop";
 
+      // @ts-ignore
       table.seats = [table.seats[0], table.seats[1]];
 
+      // @ts-ignore
       table.seats[0].chipCount = 100;
+      // @ts-ignore
       table.seats[0].chipsBetCount = 2;
       // @ts-ignore
       table.seats[0].pocketCards = [
@@ -428,7 +432,9 @@ describe("mutators", () => {
         [Face.King, Suit.Clubs],
       ];
 
+      // @ts-ignore
       table.seats[1].chipCount = 0;
+      // @ts-ignore
       table.seats[1].chipsBetCount = 6;
       // @ts-ignore
       table.seats[1].pocketCards = [
@@ -436,6 +442,7 @@ describe("mutators", () => {
         [Face.Ace, Suit.Clubs],
       ];
 
+      // @ts-ignore
       table.turnToBetIndex = 0;
 
       const mutatedTable = foldMutator({ table, data: { seatToken: "a" } });
@@ -544,11 +551,13 @@ describe("mutators", () => {
       expect(mutatedTable.bettingRound).toBe("pre-deal");
     });
 
-    it("It moves the dealer to the first non bust player to the left of the current dealer", () => {
+    it("Moves the dealer to the first non bust player to the left of the current dealer", () => {
       const table = createMockTable(100);
 
       //@ts-ignore
       table.dealerIndex = 1;
+      //@ts-ignore
+      table.seats[2].chipCount = 0;
       //@ts-ignore
       table.seats[2].isBust = true;
 
@@ -556,6 +565,21 @@ describe("mutators", () => {
 
       // Seat 2 is bust so the deal skips right to 3
       expect(mutatedTable.dealerIndex).toBe(3);
+    });
+
+    it("sets all newly bust players as isBust and moves the dealer to the first non bust player even if they went out this hand", () => {
+      const table = createMockTable(100);
+
+      //@ts-ignore
+      table.dealerIndex = 1;
+      //@ts-ignore
+      table.seats[2].chipCount = 0;
+
+      const mutatedTable = endHandMutator({ table, data: {} });
+
+      // Seat 2 is bust so the deal skips right to 3
+      expect(mutatedTable.dealerIndex).toBe(3);
+      expect(mutatedTable.seats[2].isBust).toBeTruthy();
     });
 
     it("It resets data that is no longer relevant", () => {

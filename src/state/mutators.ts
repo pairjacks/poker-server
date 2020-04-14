@@ -463,22 +463,32 @@ export const endHandMutator: TableMutatorFunction<EndHandOptions> = ({
 }): Table => {
   const revealHandTable = revealWinningHandsMutator({ table, data: {} });
 
+  return moveDealerButtonMutator({
+    table: {
+      ...revealHandTable,
+      bettingRound: "pre-deal",
+      turnToBetIndex: undefined,
+      splitPots: [],
+      seats: revealHandTable.seats.map((s) => {
+        return {
+          ...s,
+          isFolded: false,
+          isBust: s.chipCount === 0,
+        };
+      }),
+    },
+    data: {},
+  });
+};
+
+interface MoveDealerButtonMutatorOptions {}
+
+export const moveDealerButtonMutator: TableMutatorFunction<MoveDealerButtonMutatorOptions> = ({
+  table,
+}): Table => {
   return {
-    ...revealHandTable,
-    bettingRound: "pre-deal",
-    dealerIndex: indexOfFirstNonBustSeatToLeftOfIndex(
-      revealHandTable,
-      revealHandTable.dealerIndex
-    ),
-    turnToBetIndex: undefined,
-    splitPots: [],
-    seats: revealHandTable.seats.map((s) => {
-      return {
-        ...s,
-        isFolded: false,
-        isBust: s.chipCount === 0,
-      };
-    }),
+    ...table,
+    dealerIndex: indexOfFirstNonBustSeatToLeftOfIndex(table, table.dealerIndex),
   };
 };
 
