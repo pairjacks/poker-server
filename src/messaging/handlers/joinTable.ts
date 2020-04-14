@@ -1,8 +1,7 @@
 import WebSocket from "ws";
-import { getTable, saveTable } from "../../state/global";
+import { getTable, saveTable } from "../../state/state";
 import {
   sendTableStateMessage,
-  sendMessage,
   registerWebsocket,
   unregisterWebsocket
 } from "../outbound";
@@ -10,12 +9,12 @@ import { addPlayerToTableMutator } from "../../state/mutators";
 import { randomDisplayName } from "../../state/utils";
 import { ClientJoinTableMessage } from "@pairjacks/poker-messages";
 
-export const joinTable = (
+export const joinTable = async (
   ws: WebSocket,
   data: ClientJoinTableMessage
 ) => {
-  const table = getTable(data.tableName);
-  if (!table || !table.seats.find(s => s.token === data.seatToken)) {
+  const table = await getTable(data.tableName);
+  if (!table.seats.find(s => s.token === data.seatToken)) {
     return;
   }
 
@@ -34,6 +33,6 @@ export const joinTable = (
     unregisterWebsocket(data.seatToken);
   });
 
-  saveTable(mutatedTable);
+  await saveTable(mutatedTable);
   sendTableStateMessage(mutatedTable);
 };

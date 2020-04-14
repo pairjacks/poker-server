@@ -8,7 +8,8 @@
     "postinstall": "npm run tsc",
     "test": "jest",
     "tsc": "tsc",
-    "types": "tsc --skipLibCheck"
+    "types": "tsc --skipLibCheck",
+    "redis": "redis-server /usr/local/etc/redis.conf"
   },
   "repository": {
     "type": "git",
@@ -22,9 +23,9 @@
   "homepage": "https://github.com/desmondmc/poker-server#readme",
   "dependencies": {
     "@pairjacks/poker-cards": "0.1.0",
-    "@types/express": "4.17.6",
-    "express": "4.17.1",
     "@pairjacks/poker-messages": "0.1.2",
+    "express": "4.17.1",
+    "redis": "3.0.2",
     "ws": "^7.2.3"
   },
   "devDependencies": {
@@ -33,6 +34,8 @@
     "@babel/preset-typescript": "7.9.0",
     "@types/ws": "^7.2.3",
     "@types/jest": "25.2.1",
+    "@types/express": "4.17.6",
+    "@types/redis": "2.8.17",
     "babel-jest": "25.2.6",
     "jest": "25.2.7",
     "typescript": "^3.7.0"

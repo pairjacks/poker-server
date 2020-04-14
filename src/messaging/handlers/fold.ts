@@ -1,15 +1,11 @@
 import WebSocket from "ws";
-import { getTable, saveTable } from "../../state/global";
+import { getTable, saveTable } from "../../state/state";
 import { sendTableStateMessage } from "../outbound";
 import { foldMutator } from "../../state/mutators";
 import { ClientFoldMessage } from "@pairjacks/poker-messages";
 
-export const fold = (ws: WebSocket, message: ClientFoldMessage) => {
-  const table = getTable(message.tableName);
-
-  if (!table) {
-    return;
-  }
+export const fold = async (ws: WebSocket, message: ClientFoldMessage) => {
+  const table = await getTable(message.tableName);
 
   const mutatedTable = foldMutator({
     table,
@@ -18,6 +14,6 @@ export const fold = (ws: WebSocket, message: ClientFoldMessage) => {
     },
   });
 
-  saveTable(mutatedTable);
+  await saveTable(mutatedTable);
   sendTableStateMessage(mutatedTable);
 };

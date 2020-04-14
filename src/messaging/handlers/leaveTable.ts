@@ -1,14 +1,11 @@
 import WebSocket from "ws";
-import { getTable, saveTable } from "../../state/global";
+import { getTable, saveTable } from "../../state/state";
 import { sendTableStateMessage, sendMessage } from "../outbound";
 import { removePlayerFromTableMutator } from "../../state/mutators";
 import { ClientLeaveTableMessage } from "@pairjacks/poker-messages";
 
-export const leaveTable = (ws: WebSocket, data: ClientLeaveTableMessage) => {
-  const table = getTable(data.tableName);
-  if (!table) {
-    return;
-  }
+export const leaveTable = async (ws: WebSocket, data: ClientLeaveTableMessage) => {
+  const table = await getTable(data.tableName);
 
   const mutatedTable = removePlayerFromTableMutator({
     table,
@@ -17,7 +14,7 @@ export const leaveTable = (ws: WebSocket, data: ClientLeaveTableMessage) => {
     }
   });
 
-  saveTable(mutatedTable);
+  await saveTable(mutatedTable);
 
   sendMessage(ws, {
     type: "table-state",

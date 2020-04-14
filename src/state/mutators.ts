@@ -3,7 +3,7 @@ import {
   drawCardsFromDeck,
   findHighestHands,
 } from "@pairjacks/poker-cards";
-import { Table, Player, Seat } from "./global";
+import { Table, Player, Seat } from "./state";
 import {
   indexOfFirstNonBustSeatToLeftOfIndex,
   findHighestBetAtTable,

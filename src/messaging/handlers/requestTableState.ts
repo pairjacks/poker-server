@@ -1,13 +1,9 @@
 import WebSocket from "ws";
-import { getTable } from "../../state/global";
+import { getTable } from "../../state/state";
 import { sendTableStateMessage } from "../outbound";
 import { ClientRequestTableStateMessage } from "@pairjacks/poker-messages";
 
-export const requestTableState = (ws: WebSocket, data: ClientRequestTableStateMessage) => {
-  const table = getTable(data.tableName);
-  if (!table) {
-    return;
-  }
-
+export const requestTableState = async (ws: WebSocket, data: ClientRequestTableStateMessage) => {
+  const table = await getTable(data.tableName);
   sendTableStateMessage(table);
 };

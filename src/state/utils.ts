@@ -1,4 +1,4 @@
-import { Table, Seat } from "./global";
+import { Table, Seat } from "./state";
 import { LimitedTable } from "@pairjacks/poker-messages";
 
 /**

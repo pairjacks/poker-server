@@ -1,5 +1,5 @@
 import WebSocket from "ws";
-import { getTable, saveTable } from "../../state/global";
+import { getTable, saveTable } from "../../state/state";
 import { sendTableStateMessage } from "../outbound";
 import { startGameMutator } from "../../state/mutators";
 import { ClientStartGameMessage } from "@pairjacks/poker-messages";
@@ -8,8 +8,8 @@ export const startGame = async (
   ws: WebSocket,
   message: ClientStartGameMessage
 ) => {
-  const table = getTable(message.tableName);
-  if (!table || !table.seats.find((s) => s.token === message.seatToken)) {
+  const table = await getTable(message.tableName);
+  if (!table.seats.find((s) => s.token === message.seatToken)) {
     return;
   }
 
@@ -18,6 +18,6 @@ export const startGame = async (
     data: {},
   });
 
-  saveTable(mutatedTable);
+  await saveTable(mutatedTable);
   sendTableStateMessage(mutatedTable);
 };

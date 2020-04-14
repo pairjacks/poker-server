@@ -1,15 +1,11 @@
 import WebSocket from "ws";
-import { getTable, saveTable } from "../../state/global";
+import { getTable, saveTable } from "../../state/state";
 import { sendTableStateMessage } from "../outbound";
 import { placeBetMutator } from "../../state/mutators";
 import { ClientPlaceBetMessage } from "@pairjacks/poker-messages";
 
-export const placeBet = (ws: WebSocket, message: ClientPlaceBetMessage) => {
-  const table = getTable(message.tableName);
-
-  if (!table) {
-    return;
-  }
+export const placeBet = async (ws: WebSocket, message: ClientPlaceBetMessage) => {
+  const table = await getTable(message.tableName);
 
   const mutatedTable = placeBetMutator({
     table,
@@ -19,6 +15,6 @@ export const placeBet = (ws: WebSocket, message: ClientPlaceBetMessage) => {
     },
   });
 
-  saveTable(mutatedTable);
+  await saveTable(mutatedTable);
   sendTableStateMessage(mutatedTable);
 };

@@ -1,3 +1,5 @@
+import redis from "redis";
+import { promisify } from "util";
 import { Cards } from "@pairjacks/poker-cards";
 
 /**
@@ -47,12 +49,19 @@ export interface Player {
   readonly displayName: string;
 }
 
-const tables: { [tableName: string]: Table | undefined } = {};
+const redisClient = process.env.REDIS_URL
+  ? redis.createClient(process.env.REDIS_URL)
+  : redis.createClient(6379);
 
-export const saveTable = (table: Table) => {
-  tables[table.name] = table;
+const getAsync = promisify(redisClient.get).bind(redisClient);
+const setAsync = promisify(redisClient.setex).bind(redisClient);
+
+export const saveTable = async (table: Table): Promise<string> => {
+  const secondsInADay = 86400;
+  return setAsync(table.name, secondsInADay, JSON.stringify(table));
 };
 
-export const getTable = (tableName: string): Table | undefined => {
-  return tables[tableName];
+export const getTable = async (tableName: string): Promise<Table> => {
+  const tableJSON = await getAsync(tableName);
+  return JSON.parse(tableJSON);
 };

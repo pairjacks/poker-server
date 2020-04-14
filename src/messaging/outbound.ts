@@ -1,5 +1,5 @@
 import WebSocket from "ws";
-import { Table } from "../state/global";
+import { Table } from "../state/state";
 import { stripPrivateTableDataForSeat } from "../state/utils";
 import { ServerMessage, ServerTableStateMessage } from "@pairjacks/poker-messages";
 

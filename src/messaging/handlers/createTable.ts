@@ -1,6 +1,6 @@
 import WebSocket from "ws";
 import { addPlayerToTableMutator } from "../../state/mutators";
-import { saveTable, Table } from "../../state/global";
+import { saveTable, Table } from "../../state/state";
 import {
   sendTableStateMessage,
   registerWebsocket,
@@ -9,7 +9,7 @@ import {
 import { randomDisplayName } from "../../state/utils";
 import { ClientCreateTableMessage } from "@pairjacks/poker-messages";
 
-export const createTable = (ws: WebSocket, data: ClientCreateTableMessage) => {
+export const createTable = async (ws: WebSocket, data: ClientCreateTableMessage) => {
   const creatorSeatToken = generateSeatToken();
   registerWebsocket(ws, creatorSeatToken);
   ws.on("close", () => {
@@ -67,7 +67,7 @@ export const createTable = (ws: WebSocket, data: ClientCreateTableMessage) => {
     },
   });
 
-  saveTable(table);
+  await saveTable(table);
   sendTableStateMessage(table);
 };
 
