@@ -30,6 +30,7 @@ export const createTable = async (
     splitPots: [],
     mainPotChipCount: 0,
     maxBetChipCount: startingChipCount * numberOfSeats,
+    highlightRelevantCards: data.highlightRelevantCards,
     dealerIndex: 0,
     turnToBetIndex: 0,
     roundTerminatingSeatIndex: 0,

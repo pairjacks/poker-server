@@ -14,6 +14,7 @@ export interface Table {
   readonly bettingRound: BettingRound;
   readonly mainPotChipCount: number;
   readonly maxBetChipCount: number;
+  readonly highlightRelevantCards: boolean;
   readonly splitPots: SplitPot[];
 
   readonly dealerIndex: number;

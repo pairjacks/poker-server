@@ -26,6 +26,7 @@ export const stripPrivateTableDataForSeat = ({
     bettingRound: table.bettingRound,
     potChipCount: table.mainPotChipCount,
     maxBetChipCount: table.maxBetChipCount,
+    highlightRelevantCards: table.highlightRelevantCards,
     splitPots: table.splitPots.map((sp) => {
       const players = sp.seatTokens.map((seatToken) => {
         const seat = table.seats.find((s) => s.token === seatToken);
