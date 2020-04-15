@@ -1,12 +1,24 @@
 import express from "express";
 import WebSocket from "ws";
 import { processMessage } from "./messaging/router";
+import { getSeatToken } from "./messaging/handlers/getSeatToken";
 
 const PORT = process.env.PORT || 8080;
 
-const server = express().listen(PORT, () =>
-  console.log("Listening on port:", PORT)
-);
+const app = express();
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
+
+const server = app
+  .get("/seat_token/:tableName", getSeatToken)
+  .listen(PORT, () => console.log("Listening on port:", PORT));
 
 const wss = new WebSocket.Server({ server });
 

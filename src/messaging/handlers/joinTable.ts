@@ -6,7 +6,6 @@ import {
   unregisterWebsocket
 } from "../outbound";
 import { addPlayerToTableMutator } from "../../state/mutators";
-import { randomDisplayName } from "../../state/utils";
 import { ClientJoinTableMessage } from "@pairjacks/poker-messages";
 
 export const joinTable = async (
