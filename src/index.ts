@@ -1,7 +1,7 @@
 import express from "express";
 import WebSocket from "ws";
 import { processMessage } from "./messaging/router";
-import { getSeatToken } from "./messaging/handlers/getSeatToken";
+import { restJoinTable } from "./messaging/handlers/rest/restJoinTable";
 
 const PORT = process.env.PORT || 8080;
 
@@ -17,7 +17,7 @@ app.use((req, res, next) => {
 });
 
 const server = app
-  .get("/seat_token/:tableName", getSeatToken)
+  .post("/join/:tableName", restJoinTable)
   .listen(PORT, () => console.log("Listening on port:", PORT));
 
 const wss = new WebSocket.Server({ server });
