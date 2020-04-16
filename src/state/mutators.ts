@@ -127,7 +127,10 @@ export const dealMutator: TableMutatorFunction<DealOptions> = ({
     table: smallBlindsTurnTable,
     data: {
       seatToken: smallBlindSeat.token,
-      betChipCount: smallBlindSeat.chipCount >= table.smallBlind ? table.smallBlind : smallBlindSeat.chipCount,
+      betChipCount:
+        smallBlindSeat.chipCount >= table.smallBlind
+          ? table.smallBlind
+          : smallBlindSeat.chipCount,
     },
   });
 
@@ -387,11 +390,11 @@ const skipToEndOfRoundMutator: TableMutatorFunction<SkipToEndOfRoundOptions> = (
   table,
 }): Table => {
   let mutatedTable = table;
-    while (mutatedTable.bettingRound !== "pre-deal") {
-      mutatedTable = endRoundMutator({ table: mutatedTable, data: {} });
-    }
-    return mutatedTable;
-}; 
+  while (mutatedTable.bettingRound !== "pre-deal") {
+    mutatedTable = endRoundMutator({ table: mutatedTable, data: {} });
+  }
+  return mutatedTable;
+};
 
 interface EndRoundOptions {}
 
@@ -487,10 +490,26 @@ interface EndHandOptions {}
 export const endHandMutator: TableMutatorFunction<EndHandOptions> = ({
   table,
 }): Table => {
+  console.log(
+    `DEBUG ${table.name}: End Hand Before Award State: ${JSON.stringify(
+      table,
+      null,
+      2
+    )}`
+  );
+
   const awardedTable = awardWinnersMutator({
     table,
     data: {},
   });
+
+  console.log(
+    `DEBUG ${table.name}: End Hand After Award State: ${JSON.stringify(
+      table,
+      null,
+      2
+    )}`
+  );
 
   const revealHandTable = revealWinningHandsMutator({
     table: awardedTable,

@@ -30,7 +30,7 @@ export const createMockTable = (startingChipCount: number): Table => {
     name: "test-table",
     bettingRound: "pre-deal",
     roundTerminatingSeatIndex: 0,
-    activePot: { seatTokens: ["a","b","c","d"], chipCount: 0 },
+    activePot: { seatTokens: ["a", "b", "c", "d"], chipCount: 0 },
     maxBetChipCount: 4 * startingChipCount,
     highlightRelevantCards: false,
     splitPots: [],
@@ -49,7 +49,7 @@ export const createMockTable = (startingChipCount: number): Table => {
         isEmpty: false,
         isFolded: false,
         isBust: false,
-        displayName: "💃"
+        displayName: "💃",
       },
       {
         token: "b",
@@ -59,7 +59,7 @@ export const createMockTable = (startingChipCount: number): Table => {
         isFolded: false,
         isBust: false,
         isEmpty: false,
-        displayName: "💃"
+        displayName: "💃",
       },
       {
         token: "c",
@@ -69,7 +69,7 @@ export const createMockTable = (startingChipCount: number): Table => {
         isFolded: false,
         isBust: false,
         isEmpty: false,
-        displayName: "💃"
+        displayName: "💃",
       },
       {
         token: "d",
@@ -79,7 +79,7 @@ export const createMockTable = (startingChipCount: number): Table => {
         isFolded: false,
         isBust: false,
         isEmpty: false,
-        displayName: "💃"
+        displayName: "💃",
       },
     ],
   };
@@ -386,7 +386,7 @@ describe("mutators", () => {
       // @ts-ignore
       table.seats = [table.seats[0], table.seats[1]];
       // @ts-ignore
-      table.bettingRound = 'pre-flop';
+      table.bettingRound = "pre-flop";
 
       // @ts-ignore
       table.seats[0].chipCount = 100;
@@ -452,7 +452,7 @@ describe("mutators", () => {
         [Face.Seven, Suit.Spades],
         [Face.Queen, Suit.Spades],
       ];
-      
+
       // @ts-ignore
       table.bettingRound = "pre-flop";
 
@@ -913,6 +913,52 @@ describe("mutators", () => {
       expect(mutatedTable.bettingRound).toBe("pre-deal");
       expect(mutatedTable.seats[0].chipCount).toBe(40);
       expect(mutatedTable.seats[1].chipCount).toBe(0);
+    });
+
+    it("Awards with winner the pot", () => {
+      const table = createMockTable(100);
+
+      // @ts-ignore
+      table.seats = [table.seats[0], table.seats[1]];
+
+      // @ts-ignore
+      table.bettingRound = "river";
+
+      // @ts-ignore
+      table.activePot = { seatTokens: ["a", "b"], chipCount: 10 };
+
+      const communityCards: Cards = [
+        [Face.Two, Suit.Clubs],
+        [Face.Four, Suit.Hearts],
+        [Face.Six, Suit.Spades],
+        [Face.Eight, Suit.Diamonds],
+        [Face.Ten, Suit.Clubs],
+      ];
+
+      // @ts-ignore
+      table.communityCards = communityCards;
+
+      const seatACards: Cards = [
+        [Face.Four, Suit.Diamonds],
+        [Face.Three, Suit.Clubs],
+      ];
+
+      // @ts-ignore
+      table.seats[0].pocketCards = seatACards;
+
+      const seatBCards: Cards = [
+        [Face.Ace, Suit.Diamonds],
+        [Face.Two, Suit.Clubs],
+      ];
+
+      // @ts-ignore
+      table.seats[1].pocketCards = seatBCards;
+
+      const mutatedTable = endHandMutator({ table, data: {} });
+
+      expect(mutatedTable.activePot.chipCount).toBe(0);
+      expect(mutatedTable.seats[0].chipCount).toBe(110);
+      expect(mutatedTable.seats[1].chipCount).toBe(100);
     });
   });
 });
