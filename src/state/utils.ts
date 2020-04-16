@@ -1,5 +1,5 @@
-import { Table, Seat } from "./state";
-import { LimitedTable } from "@pairjacks/poker-messages";
+import { Table, Seat, Pot } from "./state";
+import { LimitedTable, ClientPot } from "@pairjacks/poker-messages";
 
 /**
  * mod function that works correctly with negative numbers.
@@ -20,26 +20,28 @@ export const stripPrivateTableDataForSeat = ({
 }: StripPrivateTableDataForSeatOptions): LimitedTable => {
   const playerSeat = table.seats.find((s) => s.token === seatToken);
 
+  const potToClientPot = (pot: Pot): ClientPot => {
+    const players = pot.seatTokens.map((seatToken) => {
+      const seat = table.seats.find((s) => s.token === seatToken);
+
+      return seat?.displayName || "unknown player";
+    });
+
+    return {
+      players,
+      chipCount: pot.chipCount,
+    };
+  };
+
   return {
     isStarted: table.isStarted,
     name: table.name,
     bettingRound: table.bettingRound,
-    potChipCount: table.mainPotChipCount,
+    activePot: potToClientPot(table.activePot),
+    splitPots: table.splitPots.map((sp) => potToClientPot(sp)),
+    communityCards: table.communityCards,
     maxBetChipCount: table.maxBetChipCount,
     highlightRelevantCards: table.highlightRelevantCards,
-    splitPots: table.splitPots.map((sp) => {
-      const players = sp.seatTokens.map((seatToken) => {
-        const seat = table.seats.find((s) => s.token === seatToken);
-
-        return seat?.displayName || "unknown player";
-      });
-
-      return {
-        players,
-        chipCount: sp.chipCount,
-      };
-    }),
-    communityCards: table.communityCards,
     seats: table.seats.map((s, index) => ({
       token: s.token,
       isEmpty: s.isEmpty,
@@ -61,6 +63,13 @@ export const stripPrivateTableDataForSeat = ({
     },
   };
 };
+
+export const removeSeatTokenFromPot = (table: Table, seatToken: string, pot: Pot): Pot => {
+  return {
+    ...pot,
+    seatTokens: table.activePot.seatTokens.filter(t => t !== seatToken),
+  }
+}
 
 export const randomDisplayName = () => {
   const emojis = [

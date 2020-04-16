@@ -3,13 +3,14 @@ import {
   drawCardsFromDeck,
   findHighestHands,
 } from "@pairjacks/poker-cards";
-import { Table, Seat } from "./state";
+import { Table, Seat, Pot } from "./state";
 import {
   indexOfFirstNonBustSeatToLeftOfIndex,
   findHighestBetAtTable,
   indexOfFirstNonFoldedNonAllInSeatLeftOfSeatIndex,
   indexOfFirstNonFoldedNonAllInSeatRightOfSeatIndex,
   getSeatsThatWentAllInLowestToHighestBet,
+  removeSeatTokenFromPot,
 } from "./utils";
 
 type TableMutatorFunction<T> = (args: TableMutatorArgs<T>) => Table;
@@ -170,6 +171,12 @@ export const dealMutator: TableMutatorFunction<DealOptions> = ({
     bettingRound: "pre-flop",
     seats: withPockets.seats.map((s) => ({ ...s, isFolded: s.isBust })),
     deck: withPockets.deck,
+    activePot: {
+      seatTokens: bigBlindBetTable.seats
+        .filter((s) => !s.isBust && !s.isFolded)
+        .map((s) => s.token),
+      chipCount: bigBlindBetTable.activePot.chipCount,
+    },
     communityCards: [],
     revealPocketIndeces: [],
     turnToBetIndex: firstTurnIndex,
@@ -315,6 +322,8 @@ export const foldMutator: TableMutatorFunction<FoldOptions> = ({
   const tableWithFoldedSeat = {
     ...table,
     turnToBetIndex: nextSeatTurnIndex,
+    activePot: removeSeatTokenFromPot(table, data.seatToken, table.activePot),
+    splitPots: table.splitPots.map(sp => removeSeatTokenFromPot(table, data.seatToken, sp)),
     seats: table.seats.map((s) => {
       return s.token === data.seatToken
         ? {
@@ -327,14 +336,7 @@ export const foldMutator: TableMutatorFunction<FoldOptions> = ({
 
   const unfoldedSeats = tableWithFoldedSeat.seats.filter((s) => !s.isFolded);
   if (unfoldedSeats.length === 1) {
-    // Only one player left in the hand. The hand is over.
-    const winningSeatToken = unfoldedSeats[0].token;
-    const awardedTable = awardWinnersMutator({
-      table: tableWithFoldedSeat,
-      data: { winningSeatToken },
-    });
-
-    return endHandMutator({ table: awardedTable, data: {} });
+    return endHandMutator({ table: tableWithFoldedSeat, data: {} });
   }
 
   return endTurnMutator({
@@ -467,12 +469,7 @@ export const endRoundMutator: TableMutatorFunction<EndRoundOptions> = ({
     }
 
     case "river":
-      const awardedTable = awardWinnersMutator({
-        table,
-        data: {},
-      });
-
-      return endHandMutator({ table: awardedTable, data: {} });
+      return endHandMutator({ table, data: {} });
   }
 };
 
@@ -481,7 +478,12 @@ interface EndHandOptions {}
 export const endHandMutator: TableMutatorFunction<EndHandOptions> = ({
   table,
 }): Table => {
-  const revealHandTable = revealWinningHandsMutator({ table, data: {} });
+  const awardedTable = awardWinnersMutator({
+    table,
+    data: {},
+  });
+
+  const revealHandTable = revealWinningHandsMutator({ table: awardedTable, data: {} });
 
   return moveDealerButtonMutator({
     table: {
@@ -553,108 +555,76 @@ interface AwardWinnersOptions {}
 export const awardWinnersMutator: TableMutatorFunction<AwardWinnersOptions> = ({
   table,
 }): Table => {
-  const remainingSeatsWithChips = table.seats.filter(
-    (s) => !s.isFolded && s.chipCount !== 0
-  );
+  const betInPotTable = moveBetsToPotMutator({ table, data: {} });
 
-  if (remainingSeatsWithChips.length === 0) {
-    const betInPotTable = moveBetsToPotMutator({ table, data: {} });
-
-    return awardSplitPotsMutator({
-      table: betInPotTable,
-      data: {},
-    });
-  }
-
-  const remainingHands = remainingSeatsWithChips.map((s) => ({
-    pocketCards: s.pocketCards,
-    communityCards: table.communityCards,
-  }));
-
-  const chipsInPotTable = moveBetsToPotMutator({ table, data: {} });
-
-  const winningHands = findHighestHands(remainingHands);
-
-  const winningSeats = winningHands.map(
-    (hand) => remainingSeatsWithChips[hand.candidateIndex]
-  );
-  const winningSeatTokens = winningSeats.map((s) => s.token);
-  const chipsCountAwardedToWinners = Math.floor(
-    chipsInPotTable.mainPotChipCount / winningHands.length
-  );
-  const chipsCountRemainingInPot =
-    chipsInPotTable.mainPotChipCount -
-    chipsCountAwardedToWinners * winningHands.length;
-
-  const awardMainPotTable: Table = {
-    ...chipsInPotTable,
-    mainPotChipCount: chipsCountRemainingInPot,
-    seats: chipsInPotTable.seats.map((s) => {
-      if (winningSeatTokens.includes(s.token)) {
-        return {
-          ...s,
-          chipCount: s.chipCount + chipsCountAwardedToWinners,
-        };
-      }
-
-      return s;
-    }),
-  };
-
-  return awardSplitPotsMutator({
-    table: awardMainPotTable,
+  return awardPotsMutator({
+    table: betInPotTable,
     data: {},
   });
 };
 
-interface AwardSplitPotsMutatorOptions {}
+interface AwardPotsMutatorOptions {}
 
-const awardSplitPotsMutator: TableMutatorFunction<AwardSplitPotsMutatorOptions> = ({
+const awardPotsMutator: TableMutatorFunction<AwardPotsMutatorOptions> = ({
   table,
 }): Table => {
-  const splitPotsAwardedTable = table.splitPots.reduce((accu, splitPot) => {
-    const validSeats = accu.seats
-      .filter((s) => !s.isFolded)
-      .filter((s) => splitPot.seatTokens.includes(s.token));
+  const pots: Pot[] = [table.activePot, ...table.splitPots];
 
-    if (validSeats.length === 0) {
-      return accu;
-    }
+  const splitPotsAwarded = pots.reduce(
+    (accu, pot) => {
+      const validSeats = accu.table.seats
+        .filter((s) => !s.isFolded)
+        .filter((s) => pot.seatTokens.includes(s.token));
 
-    const potentialWinningHands = validSeats.map((s) => ({
-      pocketCards: s.pocketCards,
-      communityCards: table.communityCards,
-    }));
+      if (validSeats.length === 0) {
+        return accu;
+      }
 
-    const winningHands = findHighestHands(potentialWinningHands);
+      const potentialWinningHands = validSeats.map((s) => ({
+        pocketCards: s.pocketCards,
+        communityCards: table.communityCards,
+      }));
 
-    const winningSeats = winningHands.map(
-      (hand) => validSeats[hand.candidateIndex]
-    );
-    const winningSeatTokens = winningSeats.map((s) => s.token);
-    const chipsCountAwardedToWinners = Math.floor(
-      splitPot.chipCount / winningHands.length
-    );
-    const chipsCountMoveToPot =
-      splitPot.chipCount - chipsCountAwardedToWinners * winningHands.length;
+      const winningHands = findHighestHands(potentialWinningHands);
 
-    return {
-      ...accu,
-      mainPotChipCount: accu.mainPotChipCount + chipsCountMoveToPot,
-      seats: accu.seats.map((s) => {
-        if (winningSeatTokens.includes(s.token)) {
-          return {
-            ...s,
-            chipCount: s.chipCount + chipsCountAwardedToWinners,
-          };
-        }
+      const winningSeats = winningHands.map(
+        (hand) => validSeats[hand.candidateIndex]
+      );
+      const winningSeatTokens = winningSeats.map((s) => s.token);
+      const chipsCountAwardedToWinners = Math.floor(
+        pot.chipCount / winningHands.length
+      );
+      const chipCountMoveToPot =
+        pot.chipCount - chipsCountAwardedToWinners * winningHands.length;
 
-        return s;
-      }),
-    };
-  }, table);
+      return {
+        table: {
+          ...accu.table,
+          seats: accu.table.seats.map((s) => {
+            if (winningSeatTokens.includes(s.token)) {
+              return {
+                ...s,
+                chipCount: s.chipCount + chipsCountAwardedToWinners,
+              };
+            }
 
-  return splitPotsAwardedTable;
+            return s;
+          }),
+        },
+        leftOverChips: accu.leftOverChips + chipCountMoveToPot,
+      };
+    },
+    { table, leftOverChips: 0 }
+  );
+
+  return {
+    ...splitPotsAwarded.table,
+    activePot: {
+      ...splitPotsAwarded.table.activePot,
+      chipCount: splitPotsAwarded.leftOverChips,
+    },
+    splitPots: [],
+  };
 };
 
 interface MoveBetsToPotOptions {}
@@ -668,9 +638,15 @@ export const moveBetsToPotMutator: TableMutatorFunction<MoveBetsToPotOptions> = 
     return accu + s.chipsBetCount;
   }, 0);
 
+  const remainingSeatTokens = splitPotTable.seats
+    .filter((s) => !s.isBust && !s.isFolded && s.chipCount)
+    .map((s) => s.token);
+
+  const newPotChipCount = splitPotTable.activePot.chipCount + totalBetsFromRound;
+
   return {
     ...splitPotTable,
-    mainPotChipCount: splitPotTable.mainPotChipCount + totalBetsFromRound,
+    activePot: { seatTokens: remainingSeatTokens, chipCount: newPotChipCount },
     seats: splitPotTable.seats.map((s) => ({ ...s, chipsBetCount: 0 })),
   };
 };
@@ -713,10 +689,11 @@ const splitPotForSeatMutator: TableMutatorFunction<SplitPotForSeatOptions> = ({
   const amountToBet = seat.chipsBetCount;
 
   const tableCopy = JSON.parse(JSON.stringify(table)) as Table;
-  // @ts-ignore
-  tableCopy.mainPotChipCount = 0;
+
+  // Move chips from activePot to this new split pot.
+  tableCopy.activePot.chipCount = 0;
   const newSplitPot = {
-    chipCount: table.mainPotChipCount,
+    chipCount: table.activePot.chipCount,
     seatTokens: table.seats
       .filter((s) => !s.isFolded && s.chipsBetCount)
       .map((s) => s.token),
@@ -737,6 +714,7 @@ const splitPotForSeatMutator: TableMutatorFunction<SplitPotForSeatOptions> = ({
 
   return {
     ...tableCopy,
+    activePot: removeSeatTokenFromPot(tableCopy, data.seatToken, table.activePot),
     splitPots: [...table.splitPots, newSplitPot],
   };
 };

@@ -23,7 +23,7 @@
   "homepage": "https://github.com/desmondmc/poker-server#readme",
   "dependencies": {
     "@pairjacks/poker-cards": "0.1.0",
-    "@pairjacks/poker-messages": "0.1.9",
+    "@pairjacks/poker-messages": "0.1.10",
     "express": "4.17.1",
     "redis": "3.0.2",
     "ws": "^7.2.3"

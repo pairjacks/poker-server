@@ -12,10 +12,10 @@ export interface Table {
   readonly name: string;
   readonly smallBlind: number;
   readonly bettingRound: BettingRound;
-  readonly mainPotChipCount: number;
+  readonly activePot: Pot;
+  readonly splitPots: Pot[];
   readonly maxBetChipCount: number;
   readonly highlightRelevantCards: boolean;
-  readonly splitPots: SplitPot[];
 
   readonly dealerIndex: number;
   readonly roundTerminatingSeatIndex: number;
@@ -29,7 +29,7 @@ export interface Table {
   readonly communityCards: Cards;
 }
 
-export interface SplitPot {
+export interface Pot {
   seatTokens: string[];
   chipCount: number;
 }

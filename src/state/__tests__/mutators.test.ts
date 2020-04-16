@@ -30,8 +30,9 @@ export const createMockTable = (startingChipCount: number): Table => {
     name: "test-table",
     bettingRound: "pre-deal",
     roundTerminatingSeatIndex: 0,
-    mainPotChipCount: 0,
+    activePot: { seatTokens: ["a","b","c","d"], chipCount: 0 },
     maxBetChipCount: 4 * startingChipCount,
+    highlightRelevantCards: false,
     splitPots: [],
     dealerIndex: 0,
     turnToBetIndex: 0,
@@ -45,8 +46,10 @@ export const createMockTable = (startingChipCount: number): Table => {
         chipCount: startingChipCount,
         chipsBetCount: 0,
         pocketCards: [],
+        isEmpty: false,
         isFolded: false,
         isBust: false,
+        displayName: "💃"
       },
       {
         token: "b",
@@ -55,6 +58,8 @@ export const createMockTable = (startingChipCount: number): Table => {
         pocketCards: [],
         isFolded: false,
         isBust: false,
+        isEmpty: false,
+        displayName: "💃"
       },
       {
         token: "c",
@@ -63,6 +68,8 @@ export const createMockTable = (startingChipCount: number): Table => {
         pocketCards: [],
         isFolded: false,
         isBust: false,
+        isEmpty: false,
+        displayName: "💃"
       },
       {
         token: "d",
@@ -71,6 +78,8 @@ export const createMockTable = (startingChipCount: number): Table => {
         pocketCards: [],
         isFolded: false,
         isBust: false,
+        isEmpty: false,
+        displayName: "💃"
       },
     ],
   };
@@ -393,7 +402,7 @@ describe("mutators", () => {
 
       expect(table2).not.toBe(table1);
       expect(table2.bettingRound).toBe("pre-deal");
-      expect(table2.mainPotChipCount).toBe(0);
+      expect(table2.activePot.chipCount).toBe(0);
       expect(table2.splitPots).toEqual([]);
       expect(table2.seats[0].chipCount).toBe(154);
     });
@@ -635,8 +644,7 @@ describe("mutators", () => {
     it("Create split pots if needed", () => {
       const table = createMockTable(100);
 
-      // @ts-ignore
-      table.mainPotChipCount = 40;
+      table.activePot.chipCount = 40;
 
       // @ts-ignore
       table.seats[0].chipCount = 90;
@@ -699,11 +707,11 @@ describe("mutators", () => {
       ];
 
       // @ts-ignore
-      table.mainPotChipCount = 100;
+      table.activePot.chipCount = 100;
 
       const mutatedTable = awardWinnersMutator({ table, data: {} });
 
-      expect(mutatedTable.mainPotChipCount).toBe(0);
+      expect(mutatedTable.activePot.chipCount).toBe(0);
       expect(mutatedTable.seats[0].chipCount).toBe(200);
     });
 
@@ -746,14 +754,14 @@ describe("mutators", () => {
       ];
 
       // @ts-ignore
-      table.mainPotChipCount = 100;
+      table.activePot.chipCount = 100;
 
       const mutatedTable = awardWinnersMutator({ table, data: {} });
 
       expect(mutatedTable.seats[0].chipCount).toBe(133);
       expect(mutatedTable.seats[1].chipCount).toBe(133);
       expect(mutatedTable.seats[2].chipCount).toBe(133);
-      expect(mutatedTable.mainPotChipCount).toBe(1);
+      expect(mutatedTable.activePot.chipCount).toBe(1);
     });
 
     it("Awards splitpots properly", () => {
@@ -801,7 +809,7 @@ describe("mutators", () => {
       ];
 
       // @ts-ignore
-      table.mainPotChipCount = 100; // Awarded to "b" since "a" went all in and can only be awarded the split pots
+      table.activePot = { seatTokens: ["b", "c"], chipCount: 100 }; // Awarded to "b" since "a" went all in and can only be awarded the split pots
 
       const mutatedTable = awardWinnersMutator({ table, data: {} });
 
