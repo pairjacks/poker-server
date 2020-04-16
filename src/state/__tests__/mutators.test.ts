@@ -139,6 +139,34 @@ describe("mutators", () => {
       expect(bigBlindSeat.chipCount).toBe(98);
     });
 
+    it("Places the big blind and the small blind. If players can't affor the blinds then it puts them all in", () => {
+      const table = createMockTable(100);
+
+      // @ts-ignore
+      table.smallBlind = 2;
+
+      // @ts-ignore
+      table.seats[1].chipCount = 1;
+
+      // @ts-ignore
+      table.seats[2].chipCount = 3;
+
+      const mutatedTable = dealMutator({
+        table,
+        data: { seatToken: "a", deck: mockDeck },
+      });
+
+      expect(mutatedTable).not.toBe(table);
+
+      const smallBlindSeat = mutatedTable.seats[1];
+      const bigBlindSeat = mutatedTable.seats[2];
+
+      expect(smallBlindSeat.chipsBetCount).toBe(1);
+      expect(smallBlindSeat.chipCount).toBe(0);
+      expect(bigBlindSeat.chipsBetCount).toBe(3);
+      expect(bigBlindSeat.chipCount).toBe(0);
+    });
+
     it("Sets the turn to bet to the player left of the big blind if there are at least 3 players", () => {
       const table = createMockTable(100);
       const mutatedTable = dealMutator({

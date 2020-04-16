@@ -120,13 +120,13 @@ export const dealMutator: TableMutatorFunction<DealOptions> = ({
     ...table,
     turnToBetIndex: smallBlindIndex,
   };
-  const smallBlindSeatToken = table.seats[smallBlindIndex].token;
 
+  const smallBlindSeat = table.seats[smallBlindIndex];
   const smallBlindBetTable = placeBetMutator({
     table: smallBlindsTurnTable,
     data: {
-      seatToken: smallBlindSeatToken,
-      betChipCount: table.smallBlind,
+      seatToken: smallBlindSeat.token,
+      betChipCount: smallBlindSeat.chipCount >= table.smallBlind ? table.smallBlind : smallBlindSeat.chipCount,
     },
   });
 
@@ -134,12 +134,14 @@ export const dealMutator: TableMutatorFunction<DealOptions> = ({
     table,
     smallBlindIndex
   );
-  const bigBlindSeatToken = table.seats[bigBlindIndex].token;
+  const bigBlindSeat = table.seats[bigBlindIndex];
+  const bigBlind = table.smallBlind * 2;
   const bigBlindBetTable = placeBetMutator({
     table: smallBlindBetTable,
     data: {
-      seatToken: bigBlindSeatToken,
-      betChipCount: table.smallBlind * 2,
+      seatToken: bigBlindSeat.token,
+      betChipCount:
+        bigBlindSeat.chipCount >= bigBlind ? bigBlind : bigBlindSeat.chipCount,
     },
   });
 
@@ -323,7 +325,9 @@ export const foldMutator: TableMutatorFunction<FoldOptions> = ({
     ...table,
     turnToBetIndex: nextSeatTurnIndex,
     activePot: removeSeatTokenFromPot(table, data.seatToken, table.activePot),
-    splitPots: table.splitPots.map(sp => removeSeatTokenFromPot(table, data.seatToken, sp)),
+    splitPots: table.splitPots.map((sp) =>
+      removeSeatTokenFromPot(table, data.seatToken, sp)
+    ),
     seats: table.seats.map((s) => {
       return s.token === data.seatToken
         ? {
@@ -483,7 +487,10 @@ export const endHandMutator: TableMutatorFunction<EndHandOptions> = ({
     data: {},
   });
 
-  const revealHandTable = revealWinningHandsMutator({ table: awardedTable, data: {} });
+  const revealHandTable = revealWinningHandsMutator({
+    table: awardedTable,
+    data: {},
+  });
 
   return moveDealerButtonMutator({
     table: {
@@ -642,7 +649,8 @@ export const moveBetsToPotMutator: TableMutatorFunction<MoveBetsToPotOptions> = 
     .filter((s) => !s.isBust && !s.isFolded && s.chipCount)
     .map((s) => s.token);
 
-  const newPotChipCount = splitPotTable.activePot.chipCount + totalBetsFromRound;
+  const newPotChipCount =
+    splitPotTable.activePot.chipCount + totalBetsFromRound;
 
   return {
     ...splitPotTable,
@@ -714,7 +722,11 @@ const splitPotForSeatMutator: TableMutatorFunction<SplitPotForSeatOptions> = ({
 
   return {
     ...tableCopy,
-    activePot: removeSeatTokenFromPot(tableCopy, data.seatToken, table.activePot),
+    activePot: removeSeatTokenFromPot(
+      tableCopy,
+      data.seatToken,
+      table.activePot
+    ),
     splitPots: [...table.splitPots, newSplitPot],
   };
 };
