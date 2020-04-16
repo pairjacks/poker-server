@@ -11,6 +11,7 @@ import {
   indexOfFirstNonFoldedNonAllInSeatRightOfSeatIndex,
   getSeatsThatWentAllInLowestToHighestBet,
   removeSeatTokenFromPot,
+  isBettingStillPossibleThisHand,
 } from "./utils";
 
 type TableMutatorFunction<T> = (args: TableMutatorArgs<T>) => Table;
@@ -361,6 +362,11 @@ const endTurnMutator: TableMutatorFunction<EndTurnOptions> = ({
   table,
   data,
 }): Table => {
+  if (!isBettingStillPossibleThisHand(table)) {
+    // Betting isn't possible, skip to the end of the round.
+    return skipToEndOfRoundMutator({ table, data: {} });
+  }
+
   if (data.seatIndex !== table.roundTerminatingSeatIndex) {
     const nextSeatTurnIndex = indexOfFirstNonFoldedNonAllInSeatLeftOfSeatIndex(
       table,
@@ -372,21 +378,20 @@ const endTurnMutator: TableMutatorFunction<EndTurnOptions> = ({
     };
   }
 
-  const seatsWithMoneyToBet = table.seats.filter(
-    (s) => !s.isFolded && !s.isBust && s.chipCount
-  );
+  return endRoundMutator({ table, data: {} });
+};
 
-  if (seatsWithMoneyToBet.length < 2) {
-    // Only 1 seat with money remaining to bet. Skip to end
-    let mutatedTable = table;
+interface SkipToEndOfRoundOptions {}
+
+const skipToEndOfRoundMutator: TableMutatorFunction<SkipToEndOfRoundOptions> = ({
+  table,
+}): Table => {
+  let mutatedTable = table;
     while (mutatedTable.bettingRound !== "pre-deal") {
       mutatedTable = endRoundMutator({ table: mutatedTable, data: {} });
     }
     return mutatedTable;
-  }
-
-  return endRoundMutator({ table, data: {} });
-};
+}; 
 
 interface EndRoundOptions {}
 

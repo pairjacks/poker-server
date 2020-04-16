@@ -64,12 +64,16 @@ export const stripPrivateTableDataForSeat = ({
   };
 };
 
-export const removeSeatTokenFromPot = (table: Table, seatToken: string, pot: Pot): Pot => {
+export const removeSeatTokenFromPot = (
+  table: Table,
+  seatToken: string,
+  pot: Pot
+): Pot => {
   return {
     ...pot,
-    seatTokens: table.activePot.seatTokens.filter(t => t !== seatToken),
-  }
-}
+    seatTokens: table.activePot.seatTokens.filter((t) => t !== seatToken),
+  };
+};
 
 export const randomDisplayName = () => {
   const emojis = [
@@ -190,6 +194,28 @@ export const findHighestBetAtTable = (table: Table): number => {
   return table.seats.reduce((accu, seat) => {
     return seat.chipsBetCount > accu ? seat.chipsBetCount : accu;
   }, 0);
+};
+
+export const isBettingStillPossibleThisHand = (table: Table): boolean => {
+  const seatsThatCouldStillPotentiallDoShit = table.seats.filter(
+    (s) => !s.isFolded && !s.isBust && s.chipCount
+  );
+
+  if (seatsThatCouldStillPotentiallDoShit.length > 1) {
+    return true;
+  }
+
+  const highestBet = findHighestBetAtTable(table);
+
+  const seatsThatCouldStillDoShitThisRound = seatsThatCouldStillPotentiallDoShit.filter(
+    (s) => s.chipsBetCount < highestBet
+  );
+
+  if (seatsThatCouldStillDoShitThisRound.length) {
+    return true;
+  }
+
+  return false;
 };
 
 const indexOfFirstSeatToRightOfIndex = (table: Table, seatIndex: number) => {
