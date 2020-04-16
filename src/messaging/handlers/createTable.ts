@@ -25,7 +25,7 @@ export const createTable = async (
 
   const newTable: Table = {
     isStarted: false,
-    name: data.tableName,
+    name: encodeURIComponent(data.tableName),
     bettingRound: "pre-deal",
     activePot: { seatTokens: [], chipCount: 0 },
     splitPots: [],
