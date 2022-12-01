@@ -25,7 +25,7 @@
     "@pairjacks/poker-cards": "0.1.0",
     "@pairjacks/poker-messages": "0.1.10",
     "express": "4.17.1",
-    "redis": "3.0.2",
+    "redis": "3.1.1",
     "ws": "^7.2.3"
   },
   "devDependencies": {
