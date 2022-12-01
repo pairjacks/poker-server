@@ -5,6 +5,8 @@ import { restJoinTable } from "./messaging/handlers/rest/restJoinTable";
 
 const PORT = process.env.PORT || 8080;
 
+console.log("Launching 🚀");
+
 const app = express();
 
 app.use((req, res, next) => {
@@ -16,9 +18,13 @@ app.use((req, res, next) => {
   next();
 });
 
+console.log("Starting Express App 🚀");
+
 const server = app
   .post("/join/:tableName", restJoinTable)
   .listen(PORT, () => console.log("Listening on port:", PORT));
+
+console.log("Starting WebSocket.Server 🚀");
 
 const wss = new WebSocket.Server({ server });
 
